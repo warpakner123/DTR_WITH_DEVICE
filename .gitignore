@@ -1,0 +1,7 @@
+/.env
+/.venv
+/DTRPAYROLL/__pycache__
+/DTRPAYROLL/api/__pycache__
+/DTRPAYROLL/config/__pycache__
+/DTRPAYROLL/employeeDTR/__pycache__
+/DTRPAYROLL/employeeDTR/migrations/__pycache__
