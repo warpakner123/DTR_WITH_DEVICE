@@ -1,0 +1,372 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="{% static 'img/apple-icon.png' %}"
+    />
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
+    <title>Payroll | HR Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+    <script
+      src="https://kit.fontawesome.com/42d5adcbca.js"
+      crossorigin="anonymous"
+    ></script>
+    <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+    <link
+      id="pagestyle"
+      href="{% static 'css/argon-dashboard.css' %}"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="g-sidenav-show bg-gray-100">
+    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+    <aside
+      class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4"
+      id="sidenav-main"
+    >
+      <div class="sidenav-header">
+        <i
+          class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+          aria-hidden="true"
+          id="iconSidenav"
+        ></i>
+        <a
+          class="navbar-brand m-0"
+          href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html "
+          target="_blank"
+        >
+          <img
+            src="{% static 'img/logo-ct-dark.png' %}"
+            class="navbar-brand-img h-100"
+            alt="main_logo"
+          />
+          <span class="ms-1 font-weight-bold">Payroll: HR Solutions</span>
+        </a>
+      </div>
+      <hr class="horizontal dark mt-0" />
+      <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'hr_dashboard' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'attendance' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i
+                  class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"
+                ></i>
+              </div>
+              <span class="nav-link-text ms-1">Attendance</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'payroll' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i
+                  class="ni ni-credit-card text-success text-sm opacity-10"
+                ></i>
+              </div>
+              <span class="nav-link-text ms-1">Payroll</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+    <main class="main-content position-relative border-radius-lg">
+      <!-- Navbar -->
+      <nav
+        class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
+        id="navbarBlur"
+        data-scroll="false"
+      >
+        <div class="container-fluid py-1 px-3">
+          <nav aria-label="breadcrumb">
+            <ol
+              class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5"
+            >
+              <li class="breadcrumb-item text-sm">
+                <a class="opacity-5 text-white" href="javascript:;">Pages</a>
+              </li>
+              <li
+                class="breadcrumb-item text-sm text-white active"
+                aria-current="page"
+              >
+                Dashboard
+              </li>
+            </ol>
+            <h6 class="font-weight-bolder text-white mb-0">Dashboard</h6>
+          </nav>
+          <div
+            class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
+            id="navbar"
+          >
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+              <ul class="navbar-nav justify-content-end">
+                <li class="nav-item d-flex align-items-center">
+                  <a
+                    href="{% url 'logout' %}"
+                    class="nav-link text-white font-weight-bold px-0"
+                  >
+                    <i class="fa fa-user me-sm-1"></i>
+                    <span class="d-sm-inline d-none">Log Out</span>
+                  </a>
+                </li>
+                <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+                  <a
+                    href="javascript:;"
+                    class="nav-link text-white p-0"
+                    id="iconNavbarSidenav"
+                  >
+                    <div class="sidenav-toggler-inner">
+                      <i class="sidenav-toggler-line bg-white"></i>
+                      <i class="sidenav-toggler-line bg-white"></i>
+                      <i class="sidenav-toggler-line bg-white"></i>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <!-- End Navbar -->
+      <div class="container-fluid py-4">
+        <div class="row">
+          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-8">
+                    <div class="numbers">
+                      <p class="text-sm mb-0 text-uppercase font-weight-bold">
+                        Total Employees
+                      </p>
+                      <h5 class="font-weight-bolder">{{total_employees}}</h5>
+                    </div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div
+                      class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle"
+                    >
+                      <i
+                        class="ni ni-single-02 text-lg opacity-10"
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-8">
+                    <div class="numbers">
+                      <p class="text-sm mb-0 text-uppercase font-weight-bold">
+                        Checked-In Today
+                      </p>
+                      <h5 class="font-weight-bolder">{{today_attendance}}</h5>
+                    </div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div
+                      class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle"
+                    >
+                      <i
+                        class="ni ni-check-bold text-lg opacity-10"
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-8">
+                    <div class="numbers">
+                      <p class="text-sm mb-0 text-uppercase font-weight-bold">
+                        Active Employees
+                      </p>
+                      <h5 class="font-weight-bolder">{{active_employees}}</h5>
+                    </div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div
+                      class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle"
+                    >
+                      <i
+                        class="ni ni-badge text-lg opacity-10"
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-sm-6">
+            <div class="card">
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-8">
+                    <div class="numbers">
+                      <p class="text-sm mb-0 text-uppercase font-weight-bold">
+                        Today's Date
+                      </p>
+                      <h5 class="font-weight-bolder">{{today_date}}</h5>
+                    </div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div
+                      class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle"
+                    >
+                      <i
+                        class="ni ni-calendar-grid-58 text-lg opacity-10"
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row py-5">
+          <div class="col-12">
+            <div class="card mb-4">
+              <div class="card-header pb-0">
+                <h6>Employee List</h6>
+              </div>
+              <div class="card-body px-0 pt-0 pb-2">
+                <div class="table-responsive p-0">
+                  <table class="table align-items-center mb-0">
+                    <thead>
+                      <tr>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Name
+                        </th>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"
+                        >
+                          Department
+                        </th>
+                        <th
+                          class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Status
+                        </th>
+                        <th
+                          class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Employed
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for employee in employees %}
+                      <tr>
+                        <td>
+                          <div class="d-flex px-2 py-1">
+                            <div>
+                              <img
+                                src="{% static 'img/team-2.jpg' %}"
+                                class="avatar avatar-sm me-3"
+                                alt="user1"
+                              />
+                            </div>
+                            <div
+                              class="d-flex flex-column justify-content-center"
+                            >
+                              <h6 class="mb-0 text-sm">
+                                {{employee.full_name}}
+                              </h6>
+                              <p class="text-xs text-secondary mb-0">
+                                {{employee.email}}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <p class="text-xs font-weight-bold mb-0">
+                            {{employee.position.position}}
+                          </p>
+                          <p class="text-xs text-secondary mb-0">
+                            {{employee.department.department_name}}
+                          </p>
+                        </td>
+                        <td class="align-middle text-center text-sm">
+                          <span class="badge badge-sm bg-gradient-success">
+                            {% if employee.status == 1 %} ACTIVE {% else %}
+                            INACTIVE {% endif %}
+                          </span>
+                        </td>
+                        <td class="align-middle text-center">
+                          <span class="text-secondary text-xs font-weight-bold"
+                            >{{employee.date_hired}}</span
+                          >
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!--   Core JS Files   -->
+    <script src="{% static 'js/core/popper.min.js' %}"></script>
+    <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/plugins/perfect-scrollbar.min.js' %}"></script>
+    <script src="{% static 'js/plugins/smooth-scrollbar.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
+    <script>
+      var win = navigator.platform.indexOf("Win") > -1;
+      if (win && document.querySelector("#sidenav-scrollbar")) {
+        var options = {
+          damping: "0.5",
+        };
+        Scrollbar.init(document.querySelector("#sidenav-scrollbar"), options);
+      }
+    </script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script src="{% static 'js/argon-dashboard.min.js' %}"></script>
+  </body>
+</html>

@@ -1,0 +1,597 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="{% static 'img/apple-icon.png' %}"
+    />
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
+    <title>Payroll | Attendance</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+    <script
+      src="https://kit.fontawesome.com/42d5adcbca.js"
+      crossorigin="anonymous"
+    ></script>
+    <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+    <link
+      id="pagestyle"
+      href="{% static 'css/argon-dashboard.css' %}"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="g-sidenav-show bg-gray-100">
+    <div
+      class="position-absolute w-100 min-height-300 top-0"
+      style="
+        background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg');
+        background-position-y: 50%;
+      "
+    >
+      <span class="mask bg-primary opacity-6"></span>
+    </div>
+
+    {% comment %} SIDEBAR {% endcomment %}
+    <aside
+      class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4"
+      id="sidenav-main"
+    >
+      <div class="sidenav-header">
+        <i
+          class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+          aria-hidden="true"
+          id="iconSidenav"
+        ></i>
+        <a
+          class="navbar-brand m-0"
+          href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html "
+          target="_blank"
+        >
+          <img
+            src="{% static 'img/logo-ct-dark.png' %}"
+            class="navbar-brand-img h-100"
+            alt="main_logo"
+          />
+          <span class="ms-1 font-weight-bold">Payroll: HR Solutions</span>
+        </a>
+      </div>
+      <hr class="horizontal dark mt-0" />
+      <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'hr_dashboard' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'attendance' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i
+                  class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"
+                ></i>
+              </div>
+              <span class="nav-link-text ms-1">Attendance</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'payroll' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i
+                  class="ni ni-credit-card text-success text-sm opacity-10"
+                ></i>
+              </div>
+              <span class="nav-link-text ms-1">Payroll</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+    {% comment %} End of SIDEBAR {% endcomment %}
+
+    <main class="main-content position-relative max-height-vh-100 h-100">
+      {% comment %} NAVBAR {% endcomment %}
+      <nav
+        class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none position-absolute w-100"
+        id="navbarBlur"
+        data-scroll="false"
+      >
+        <div class="container-fluid py-1 px-3">
+          <nav aria-label="breadcrumb">
+            <ol
+              class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5"
+            >
+              <li class="breadcrumb-item text-sm">
+                <a class="opacity-5 text-white" href="javascript:;">Pages</a>
+              </li>
+              <li
+                class="breadcrumb-item text-sm text-white active"
+                aria-current="page"
+              >
+                Attendance
+              </li>
+            </ol>
+            <h6 class="font-weight-bolder text-white mb-0">Attendance</h6>
+          </nav>
+          <div
+            class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
+            id="navbar"
+          >
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+              <ul class="navbar-nav justify-content-end">
+                <li class="nav-item d-flex align-items-center">
+                  <a
+                    href="{% url 'logout' %}"
+                    class="nav-link text-white font-weight-bold px-5"
+                  >
+                    <i class="fa fa-user me-sm-1"></i>
+                    <span class="d-sm-inline d-none">Log Out</span>
+                  </a>
+                </li>
+                <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+                  <a
+                    href="javascript:;"
+                    class="nav-link text-white p-0"
+                    id="iconNavbarSidenav"
+                  >
+                    <div class="sidenav-toggler-inner">
+                      <i class="sidenav-toggler-line bg-white"></i>
+                      <i class="sidenav-toggler-line bg-white"></i>
+                      <i class="sidenav-toggler-line bg-white"></i>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+      {% comment %} End of NAVBAR {% endcomment %}
+
+      <div style="position: absolute; left: 0" class="mt-9 mx-4 pt-4">
+        <button
+          type="button"
+          class="btn btn-success btn-md ml-3 px-4"
+          data-bs-toggle="modal"
+          data-bs-target="#manualModal"
+        >
+          <i
+            class="ni ni-fat-add mr-2 ni-md"
+            style="font-size: 20px; vertical-align: middle"
+          ></i>
+          Manual
+        </button>
+      </div>
+      {% comment %} Manual Modal {% endcomment %}
+      <div
+        class="modal fade"
+        id="manualModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="manualModalTitle"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="manualModalLabel">Add Manual DTR</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <form method="post">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="recipient-name" class="col-form-label"
+                    >Select Employee:</label
+                  >
+                  <select
+                    name="employee"
+                    id="employee"
+                    class="form-control mb-3"
+                    required
+                  >
+                    <option hidden value="" selected>
+                      No Employee Selected
+                    </option>
+                    {% for employee in employees %}
+                    <option value="{{ employee.employee_id }}">
+                      {{ employee.full_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="datetime" class="col-form-label"
+                    >Date and Time:</label
+                  >
+                  <input
+                    type="datetime-local"
+                    class="form-control"
+                    id="datetime"
+                    name="datetime"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="status" class="col-form-label">Type:</label>
+                  <select
+                    name="status"
+                    id="status"
+                    class="form-control mb-3"
+                    required
+                  >
+                    <option hidden value="" selected>No Type Selected</option>
+                    <option value="C/In">Check-in</option>
+                    <option value="C/Out">Check-out</option>
+                  </select>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn bg-gradient-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  name="manual_submit"
+                  class="btn bg-gradient-success"
+                >
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% comment %} End of Manual Modal {% endcomment %}
+
+      <div class="card shadow-lg mx-4 card-profile-bottom">
+        <div class="card-body p-5">
+          <div class="row gx-4 align-items-start">
+            <div class="col">
+              <h5 class="mb-1">Choose file to upload:</h5>
+              <p class="mb-0 font-weight-bold text-sm">
+                Supported formats: (xls)
+              </p>
+            </div>
+            <div class="col-md-auto">
+              <form
+                method="post"
+                enctype="multipart/form-data"
+                class="form-upload"
+              >
+                {% csrf_token %} {{ form.as_p }}
+                <div class="d-flex align-items-center">
+                  <button
+                    type="submit"
+                    name="upload_excel"
+                    class="btn btn-primary btn-lg ml-3"
+                  >
+                    Upload
+                  </button>
+                </div>
+              </form>
+            </div>
+            {% if messages %} {% for message in messages %}
+            <div
+              class="my-4 text-sm alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} text-white"
+              role="alert"
+            >
+              <span class="alert-text">{{ message }}</span>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% endfor %} {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid py-4">
+        <div class="row py-4">
+          <div class="col-12">
+            <div class="card mb-4">
+              <div class="card-header pb-0">
+                <h6>Company Attendance</h6>
+              </div>
+              <div class="card-body px-0 pt-0 pb-2">
+                <div class="table-responsive p-0">
+                  <table class="table align-items-left mb-0">
+                    <thead class="align-items-left">
+                      <tr>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Employee
+                        </th>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Department
+                        </th>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Datetime
+                        </th><th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Type
+                        </th><th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for dtr in dtrs %}
+                      <tr>
+                          <td>
+                              <div class="d-flex px-2 py-1">
+                                  <div>
+                                      <img
+                                          src="{% static 'img/team-2.jpg' %}"
+                                          class="avatar avatar-sm me-3"
+                                          alt="user1"
+                                      />
+                                  </div>
+                                  <div
+                                      class="d-flex flex-column justify-content-center"
+                                  >
+                                      <h6 class="mb-0 text-sm">
+                                          {{dtr.employee.full_name}}
+                                      </h6>
+                                      <p class="text-xs text-secondary mb-0">
+                                          {{dtr.employee.email}}
+                                      </p>
+                                  </div>
+                              </div>
+                          </td>
+                          <td class="align-middle text-sm mb-0">
+                              {{dtr.employee.department.department_name}}
+                          </td>
+                          <td class="align-middle text-sm mb-0">
+                              {{dtr.datetime}}
+                          </td>
+                          <td class="align-middle text-sm">
+                              {% if dtr.status == "C/In" %}
+                              <span class="badge badge-sm bg-gradient-success">
+                                  CHECK-IN
+                              </span>
+                              {% else %}
+                              <span class="badge badge-sm bg-gradient-danger">
+                                  CHECK-OUT
+                              </span>
+                              {% endif %}
+                          </td>
+                          <td class="align-middle">
+                              <i
+                                  type="button"
+                                  class="fas fa-edit"
+                                  style="font-size:24px;color:rgb(89, 90, 103)"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#editModal{{ dtr.id }}"
+                              >
+                              </i>
+                              <i
+                                  type="button"
+                                  class="fas fa-trash-alt"
+                                  style="font-size:24px;color:rgb(217, 22, 22)"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#deleteModal{{ dtr.id }}"
+                              >
+                              </i>
+                          </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!--   Core JS Files   -->
+    <script src="{% static 'js/core/popper.min.js' %}"></script>
+    <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/plugins/perfect-scrollbar.min.js' %}"></script>
+    <script src="{% static 'js/plugins/smooth-scrollbar.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
+    <script>
+      var win = navigator.platform.indexOf("Win") > -1;
+      if (win && document.querySelector("#sidenav-scrollbar")) {
+        var options = {
+          damping: "0.5",
+        };
+        Scrollbar.init(document.querySelector("#sidenav-scrollbar"), options);
+      }
+    </script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script src="{% static 'js/argon-dashboard.min.js' %}"></script>
+  </body>
+
+  <!-- Edit Modal -->
+{% for dtr in dtrs %}
+<div
+    class="modal fade"
+    id="editModal{{ dtr.id }}"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="editModalLabel{{ dtr.id }}"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel{{ dtr.id }}">Edit DTR Entry</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'edit_dtr' dtr.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Fields for editing DTR entry -->
+                    <div class="form-group">
+                        <label for="datetime" class="col-form-label">Date and Time:</label>
+                        <input
+                            type="datetime-local"
+                            class="form-control"
+                            id="datetime"
+                            name="datetime"
+                            value="{{ dtr.datetime }}"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="status" class="col-form-label">Type:</label>
+                        <select
+                            name="status"
+                            id="status"
+                            class="form-control mb-3"
+                            required
+                        >
+                            <option value="C/In" {% if dtr.status == "C/In" %}selected{% endif %}>Check-in</option>
+                            <option value="C/Out" {% if dtr.status == "C/Out" %}selected{% endif %}>Check-out</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn bg-gradient-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Close
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn bg-gradient-success"
+                    >
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+  <!-- Delete Modal -->
+{% for dtr in dtrs %}
+<div
+    class="modal fade"
+    id="deleteModal{{ dtr.id }}"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="deleteModalLabel{{ dtr.id }}"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ dtr.id }}">Delete DTR Entry</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'edit_dtr' dtr.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Fields for editing DTR entry -->
+                    <div class="form-group">
+                        <label for="datetime" class="col-form-label">Date and Time:</label>
+                        <input
+                            type="datetime-local"
+                            class="form-control"
+                            id="datetime"
+                            name="datetime"
+                            value="{{ dtr.datetime }}"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="status" class="col-form-label">Type:</label>
+                        <select
+                            name="status"
+                            id="status"
+                            class="form-control mb-3"
+                            required
+                        >
+                            <option value="C/In" {% if dtr.status == "C/In" %}selected{% endif %}>Check-in</option>
+                            <option value="C/Out" {% if dtr.status == "C/Out" %}selected{% endif %}>Check-out</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn bg-gradient-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Close
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn bg-gradient-success"
+                    >
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+</html>
