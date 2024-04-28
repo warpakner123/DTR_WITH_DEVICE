@@ -227,6 +227,7 @@ def payroll(request):
         employee_id = request.POST.get('employee')
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
+        deduct = request.POST.get('deductions')
 
         if not all([employee_id, start_date, end_date]):
             messages.error(request, 'All fields are required.')
@@ -251,7 +252,7 @@ def payroll(request):
                     messages.error(request, 'No DTR records found for the selected employee and date range.')
                     return redirect('payroll')
 
-                payroll_data_json = calculate_payroll(dtr_records, start_date, end_date)
+                payroll_data_json = calculate_payroll(dtr_records, start_date, end_date, deduct)
                 payroll_data = json.loads(payroll_data_json)
 
                 return render(request, 'generate_payslip.html', {

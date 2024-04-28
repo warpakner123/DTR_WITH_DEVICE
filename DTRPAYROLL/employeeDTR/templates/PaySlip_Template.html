@@ -46,7 +46,8 @@
         <p>Overtime Hours: {{ PaySlip_Data.overtime_hours }} hrs</p>
         <p>Gross Pay (Overtime): <strong>Php</strong> {{ PaySlip_Data.gross_pay_overtime }}</p>
         <div class="separator"></div>
-        {% if PaySlip_Data.deductions_details %}
+
+        {% if PaySlip_Data.deduct == 'yes' %}
         <p>List of all deductions for this pay period:</p>
         <div class="separator"></div>
         <ul>
@@ -55,8 +56,8 @@
             {% endfor %}
         </ul>
         <div class="separator"></div>
-        {% endif %}
         <p>Total Amount of Deductions: <strong>Php</strong> {{ PaySlip_Data.total_deductions }}</p>
+        {% endif %}
         <div class="separator"></div>
         <p>Gross Pay: <strong>Php</strong> {{ PaySlip_Data.gross_pay }}</p>
         <div class="separator"></div>

@@ -20,17 +20,6 @@ def print_loans_taxes_data(employee):
         loan_tax = deduction.loanTaxes
         print(f"{loan_tax.name} : ₱{loan_tax.amount:.2f}")
 
-# def calculate_hours_for_day(dtr_entries):
-#     """Calculate regular and overtime hours for a given day."""
-#     if not dtr_entries:
-#         return 0, 0
-#     check_in = min(dtr_entries, key=lambda x: x.datetime).datetime
-#     check_out = max(dtr_entries, key=lambda x: x.datetime).datetime
-#     total_hours = ((check_out - check_in).total_seconds() / 3600)
-#     regular_hours = min(total_hours, 8)
-#     overtime_hours = max(0, total_hours - regular_hours)
-#     return regular_hours, overtime_hours
-
 def calculate_hours_for_day(dtr_entries):
     """Calculate regular and overtime hours for a given day."""
     if not dtr_entries:
@@ -78,7 +67,7 @@ def calculate_hours_for_day(dtr_entries):
     return regular_hours, overtime_hours
 
 
-def calculate_payroll(dtr_records, start_date, end_date):
+def calculate_payroll(dtr_records, start_date, end_date, deduct):
     """Calculate payroll for all employees within a specified period."""
     payroll_data = []
 
@@ -121,7 +110,7 @@ def calculate_payroll(dtr_records, start_date, end_date):
 
         gross_pay_regular = total_regular_hours * employee.hourly_rate
         gross_pay_overtime = total_overtime_hours * employee.Overtime_rate
-        total_deductions = 0 if period == f'16-{last_day_of_month}' else Deductions.objects.filter(employee=employee).aggregate(Sum('loanTaxes__amount'))['loanTaxes__amount__sum'] or 0
+        total_deductions = 0 if deduct == 'no' else Deductions.objects.filter(employee=employee).aggregate(Sum('loanTaxes__amount'))['loanTaxes__amount__sum'] or 0
         net_pay = gross_pay_regular + gross_pay_overtime - total_deductions
 
         payroll_data.append({
@@ -139,6 +128,7 @@ def calculate_payroll(dtr_records, start_date, end_date):
             'deductions_details': [{'name': deduction.loanTaxes.name, 'amount': deduction.loanTaxes.amount} for deduction in Deductions.objects.filter(employee=employee)],
             'total_deductions': total_deductions,
             'net_pay': net_pay,
+            'deduct': deduct,
         })
 
         payroll_data_json = json.dumps(payroll_data, ensure_ascii=False)
