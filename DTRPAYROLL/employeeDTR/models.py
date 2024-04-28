@@ -69,3 +69,8 @@ class DTR(models.Model):
 class Deductions(models.Model):
     employee=models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
     loanTaxes=models.ForeignKey(LoansTaxes, on_delete=models.CASCADE, null=True)
+
+class NightDifferential(models.Model):
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    rate_multiplier = models.DecimalField(max_digits=5, decimal_places=2)  # Rate multiplier for night differential
