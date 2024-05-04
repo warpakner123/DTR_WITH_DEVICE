@@ -9,4 +9,5 @@ urlpatterns = [
     path('logout/', views.logout_user, name='logout'),
     path('generate-pdf-payroll/', views.generate_pdf_payroll_view, name='generate-pdf-payroll'),
     path('edit_dtr/<int:dtr_id>/', views.edit_dtr, name='edit_dtr'),
+    path('profile/', views.profile, name='profile')
 ]

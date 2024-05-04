@@ -302,3 +302,6 @@ def edit_dtr(request, dtr_id):
     else:
         form = DTRForm(instance=dtr_instance)
     return render(request, 'edit_dtr.html', {'form': form})
+
+def profile(request):
+    return render(request, 'profile.html')
