@@ -1,5 +1,6 @@
 /.env
 /.venv
+/env
 /DTRPAYROLL/__pycache__
 /DTRPAYROLL/api/__pycache__
 /DTRPAYROLL/config/__pycache__

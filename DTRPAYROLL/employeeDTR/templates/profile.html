@@ -2,198 +2,558 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="{% static 'img/apple-icon.png' %}"
+    />
     <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
-    <title>Employee | Profile</title>
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <title>Payroll | Employee</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
     <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
     <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <script
+      src="https://kit.fontawesome.com/42d5adcbca.js"
+      crossorigin="anonymous"
+    ></script>
     <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
-    <link id="pagestyle" href="{% static 'css/argon-dashboard.css' %}" rel="stylesheet" />
-</head>
+    <link
+      id="pagestyle"
+      href="{% static 'css/argon-dashboard.css' %}"
+      rel="stylesheet"
+    />
+  </head>
 
-<body class="g-sidenav-show bg-gray-100">
-    <div class="position-absolute w-100 min-height-300 top-0"
-        style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg'); background-position-y: 50%;">
-        <span class="mask bg-primary opacity-6"></span>
+  <body class="g-sidenav-show bg-gray-100">
+    <div
+      class="position-absolute w-100 min-height-300 top-0"
+      style="
+        background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg');
+        background-position-y: 50%;
+      "
+    >
+      <span class="mask bg-primary opacity-6"></span>
     </div>
     <aside
-        class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 "
-        id="sidenav-main">
-        <div class="sidenav-header">
-            <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
-                aria-hidden="true" id="iconSidenav"></i>
-            <a class="navbar-brand m-0" href=" {% url 'hr_dashboard' %} "
-                target="_self">
-                <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo">
-                <span class="ms-1 font-weight-bold">Payroll: HR Solutions</span>
+      class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4"
+      id="sidenav-main"
+    >
+      <div class="sidenav-header">
+        <i
+          class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+          aria-hidden="true"
+          id="iconSidenav"
+        ></i>
+        <a
+          class="navbar-brand m-0"
+          href=" {% url 'hr_dashboard' %} "
+          target="_self"
+        >
+          <img
+            src="{% static 'img/logo-ct-dark.png' %}"
+            class="navbar-brand-img h-100"
+            alt="main_logo"
+          />
+          <span class="ms-1 font-weight-bold">Payroll: HR Solutions</span>
+        </a>
+      </div>
+      <hr class="horizontal dark mt-0" />
+      <div class="w-auto" id="sidenav-collapse-main">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'hr_dashboard' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Dashboard</span>
             </a>
-        </div>
-        <hr class="horizontal dark mt-0">
-        <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'hr_dashboard' %}">
-                        <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item ">
-                    <a class="nav-link " href="{% url 'attendance' %}">
-                        <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Attendance</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'payroll' %}">
-                        <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Payroll</span>
-                    </a>
-                </li>
-                <!-- new page -->
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'profile' %}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
-                    >
-                        <i class="ni ni-badge text-primary text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Employee</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'attendance' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i
+                  class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"
+                ></i>
+              </div>
+              <span class="nav-link-text ms-1">Attendance</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'payroll' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i
+                  class="ni ni-credit-card text-success text-sm opacity-10"
+                ></i>
+              </div>
+              <span class="nav-link-text ms-1">Payroll</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'compensation' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i class="ni ni-money-coins text-danger text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Compensation</span>
+            </a>
+          </li>
+          <li class="nav-item mt-3">
+            <h6
+              class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6"
+            >
+              Account pages
+            </h6>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'profile' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i class="ni ni-badge text-info text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Employee</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'department' %}">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+              >
+                <i class="ni ni-building text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Department</span>
+            </a>
+          </li>
+        </ul>
+      </div>
     </aside>
     <main class="main-content position-relative max-height-vh-100 h-100">
-        <!-- Navbar -->
-        <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none position-absolute w-100 " id="navbarBlur"
-            data-scroll="false">
-            <div class="container-fluid py-1 px-3">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-                        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white"
-                                href="javascript:;">Pages</a></li>
-                        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Profile</li>
-                    </ol>
-                    <h6 class="font-weight-bolder text-white mb-0">Employee</h6>
-                </nav>
-                <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-                    <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                        <ul class="navbar-nav  justify-content-end">
-                            <li class="nav-item d-flex align-items-center">
-                                <a href="{% url 'logout' %}" class="nav-link text-white font-weight-bold px-5">
-                                    <i class="fa fa-user me-sm-1"></i>
-                                    <span class="d-sm-inline d-none">Log Out</span>
-                                </a>
-                            </li>
-                            <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-                                <a href="javascript:;" class="nav-link text-white p-0" id="iconNavbarSidenav">
-                                    <div class="sidenav-toggler-inner">
-                                        <i class="sidenav-toggler-line bg-white"></i>
-                                        <i class="sidenav-toggler-line bg-white"></i>
-                                        <i class="sidenav-toggler-line bg-white"></i>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
+      <!-- Navbar -->
+      <nav
+        class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none position-absolute w-100"
+        id="navbarBlur"
+        data-scroll="false"
+      >
+        <div class="container-fluid py-1 px-3">
+          <nav aria-label="breadcrumb">
+            <ol
+              class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5"
+            >
+              <li class="breadcrumb-item text-sm">
+                <a class="opacity-5 text-white" href="javascript:;">Pages</a>
+              </li>
+              <li
+                class="breadcrumb-item text-sm text-white active"
+                aria-current="page"
+              >
+                Profile
+              </li>
+            </ol>
+            <h6 class="font-weight-bolder text-white mb-0">Employee</h6>
+          </nav>
+          <div
+            class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
+            id="navbar"
+          >
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+              <ul class="navbar-nav justify-content-end">
+                <li class="nav-item d-flex align-items-center">
+                  <a
+                    href="{% url 'logout' %}"
+                    class="nav-link text-white font-weight-bold px-5"
+                  >
+                    <i class="fa fa-user me-sm-1"></i>
+                    <span class="d-sm-inline d-none">Log Out</span>
+                  </a>
+                </li>
+                <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+                  <a
+                    href="javascript:;"
+                    class="nav-link text-white p-0"
+                    id="iconNavbarSidenav"
+                  >
+                    <div class="sidenav-toggler-inner">
+                      <i class="sidenav-toggler-line bg-white"></i>
+                      <i class="sidenav-toggler-line bg-white"></i>
+                      <i class="sidenav-toggler-line bg-white"></i>
                     </div>
-
-                </div>
+                  </a>
+                </li>
+              </ul>
             </div>
-        </nav>
-        <!-- End Navbar -->
-        <div class="card shadow-lg mx-4 card-profile-bottom">
-            <div class="card-body p-5 ">
-                <div class="row gx-4 align-items-start">
-                    <div class="col">
-                        <form method="post" enctype="multipart/form-data" class="form-upload">
-                            {% csrf_token %}
-                            <div class="mb-4">
-                                <h6>Select Action:</h6>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="generatePayslip" value="payslip" checked>
-                                    <label class="form-check-label" for="generatePayslip">
-                                        Generate Payslip
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="generateDTR" value="dtr">
-                                    <label class="form-check-label" for="generateDTR">
-                                        Generate DTR
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="border-0 p-4 mb-2 bg-gray-100 border-radius-lg">
-                            <div id="payslipFields">
-                                <h5 class="mb-4">Export PDF</h5>
-                                <label for="employee">Select Employee:</label>
-                                <select name="employee" id="employee" class="form-control mb-3" required>
-                                    <option hidden value="" selected>No Employee Selected</option>
-                                    {% for employee in employees %}
-                                    <option value="{{ employee.employee_id }}">{{ employee.full_name }}</option>
-                                    {% endfor %}
-                                </select>
-                                <label for="start_date">Start Date:</label>
-                                <input type="date" id="start_date" name="start_date" class="form-control mb-3" required>
-                                <label for="end_date">End Date:</label>
-                                <input type="date" id="end_date" name="end_date" class="form-control mb-5" required>
+          </div>
+        </div>
+      </nav>
+      <!-- End Navbar -->
 
-                                <div class="mb-4">
-                                <h6>Include Deduction?</h6>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="deductions" id="yes" value="yes" checked>
-                                    <label class="form-check-label" for="yes">
-                                        Yes
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="deductions" id="no" value="no">
-                                    <label class="form-check-label" for="no">
-                                        No
-                                    </label>
-                                </div>
-                            </div>
+      <div style="position: absolute; left: 0" class="mt-9 mx-4 pt-4">
+        <button
+          type="button"
+          class="btn btn-success btn-md ml-3 px-4"
+          data-bs-toggle="modal"
+          data-bs-target="#addModal"
+        >
+          <i
+            class="ni ni-fat-add mr-2 ni-md"
+            style="font-size: 20px; vertical-align: middle"
+          ></i>
+          Add
+        </button>
+      </div>
 
-                            </div>
-
-                            <div class="d-flex align-items-center">
-                                <input type="submit" value="Submit" class="btn btn-primary btn-lg ml-3">
-                            </div>                            </div>
-
-                        </form>
-                    </div>
-                </div>
-                {% if messages %}
-                {% for message in messages %}
-                <div class="my-4 text-sm alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} text-white"
-                    role="alert">
-                    <span class="alert-text">{{ message }}</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                {% endfor %}
-                {% endif %}
+      {% comment %} Manual Modal {% endcomment %}
+      <div
+        class="modal fade"
+        id="addModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="addModalTitle"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-lg"  role="document" style="right:0;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addModalLabel">
+                Add Employee Profile
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
             </div>
+            <form method="post">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="first_name" class="col-form-label"
+                      >First Name:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="first_name"
+                      name="first_name"
+                      required
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="last_name" class="col-form-label"
+                      >Last Name:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="last_name"
+                      name="last_name"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="email" class="col-form-label">Email:</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="email"
+                      name="email"
+                      required
+                    />
+                  </div> 
+                  <div class="col-6">
+                    <label for="dob" class="col-form-label">Date of Birth:</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="dob"
+                      name="dob"
+                      required
+                    />
+                  </div> 
+                </div>
+                <div class="form-group">
+                  <label for="address" class="col-form-label">Address:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="address"
+                    name="address"
+                    required
+                  />
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="first_name" class="col-form-label"
+                      >Department:</label
+                    >
+                    <select
+                      name="department"
+                      id="department"
+                      class="form-control mb-3"
+                      required
+                    >
+                      <option hidden value="" selected>
+                        No Department Selected
+                      </option>
+                      {% for department in departments %}
+                      <option value="{{ department.department_id }}">
+                        {{ department.department_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="position" class="col-form-label"
+                      >Position:</label
+                    >
+                    <select
+                      name="position"
+                      id="position"
+                      class="form-control mb-3"
+                      required
+                    >
+                      <option hidden value="" selected>
+                        No Position Selected
+                      </option>
+                      {% for position in positions %}
+                      <option value="{{ position.position_id }}">
+                        {{ position.position }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="hourly_rate" class="col-form-label"
+                      >Hourly Rate:</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="hourly_rate"
+                      name="hourly_rate"
+                      required
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="overtime_rate" class="col-form-label"
+                      >Overtime Rate:</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="overtime_rate"
+                      name="overtime_rate"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="employee_type" class="col-form-label"
+                      >Employee Type:</label
+                    >
+                    <select
+                      name="employee_type"
+                      id="employee_type"
+                      class="form-control mb-3"
+                      required
+                    >
+                      <option hidden value="" selected>
+                        No Employee Type Selected
+                      </option>
+                      <option value="full-time">Full-Time</option>
+                      <option value="part-time">Part-Time</option>
+                      <option value="flex-time">Flex-Time</option>
+                      <option value="project-based">Project-Based</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="date_hired" class="col-form-label"
+                    >Date Hired:</label
+                    >
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="date_hired"
+                      name="date_hired"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn bg-gradient-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  name="manual_submit"
+                  class="btn bg-gradient-success"
+                >
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
+      {% comment %} End of Manual Modal {% endcomment %}
 
+      <div class="card shadow-lg mx-4 card-profile-bottom">
+        <div class="card-body">
+          <div class="card-header pb-0">
+            <h6>Employee Account List</h6>
+          </div>
+          <div class="card-body px-0 pt-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-left mb-0">
+                <thead class="align-items-left">
+                  <tr>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                    >
+                      Employee
+                    </th>
+                   
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                    >
+                      Department
+                    </th>
+                     <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                    >
+                      Employee Type
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                    >
+                      Date Hired
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                    >
+                      Have Account
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for employee in employees %}
+                  <tr>
+                    <td class="align-middle">
+                      <div class="d-flex px-2 py-1">
+                        <div>
+                          <img
+                            src="{% static 'img/team-2.jpg' %}"
+                            class="avatar avatar-sm me-3"
+                            alt="user1"
+                          />
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                          <h6 class="mb-0 text-sm">{{employee.full_name}}</h6>
+                          <p class="text-xs text-secondary mb-0">
+                            {{employee.email}}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="align-middle">
+                      <p class="text-xs font-weight-bold mb-0">
+                        {{employee.position.position}}
+                      </p>
+                      <p class="text-xs text-secondary mb-0">
+                        {{employee.department.department_name}}
+                      </p>
+                    </td>
+                    <td class="align-middle text-sm mb-0">
+                      {{employee.employee_type}}
+                    </td>
+                    <td class="align-middle text-sm mb-0">
+                      {{employee.date_hired}}
+                    </td>
+                    <td class="align-middle text-sm mb-0">
+                      {{employee.employee_type}}
+                    </td>
+                    <td class="align-middle text-sm">
+                      {% if employee.status == 1 %}
+                      <span class="badge badge-sm bg-gradient-success">
+                        ACTIVE
+                      </span>
+                      {% else %}
+                      <span class="badge badge-sm bg-gradient-danger">
+                        INACTIVE
+                      </span>
+                      {% endif %}
+                    </td>
+                    <td class="align-middle text-sm mb-0">
+                       <i
+                        type="button"
+                        class="fas fa-eye text-primary text-sm user-select-none p-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editModal{{ dtr.id }}"
+                      >
+                      <i
+                        type="button"
+                        class="fas fa-edit text-secondary text-sm user-select-none p-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editModal{{ dtr.id }}"
+                      >
+                      </i>
+                      <i
+                        type="button"
+                        class="fas fa-trash-alt text-danger text-sm user-select-none"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal{{ dtr.id }}"
+                      >
+                      </i>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div class="container-fluid py-4">
-        </div>
+      </div>
+
+      <div class="container-fluid py-4"></div>
     </main>
 
     <!--   Core JS Files   -->
@@ -203,16 +563,15 @@
     <script src="{% static 'js/plugins/smooth-scrollbar.min.js' %}"></script>
     <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
     <script>
-        var win = navigator.platform.indexOf('Win') > -1;
-        if (win && document.querySelector('#sidenav-scrollbar')) {
-            var options = {
-                damping: '0.5'
-            }
-            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-        }
+      var win = navigator.platform.indexOf("Win") > -1;
+      if (win && document.querySelector("#sidenav-scrollbar")) {
+        var options = {
+          damping: "0.5",
+        };
+        Scrollbar.init(document.querySelector("#sidenav-scrollbar"), options);
+      }
     </script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="{% static 'js/argon-dashboard.min.js' %}"></script>
-</body>
-
+  </body>
 </html>
