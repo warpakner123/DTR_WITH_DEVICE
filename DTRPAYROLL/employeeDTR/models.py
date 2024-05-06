@@ -4,18 +4,21 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 
 class Department(models.Model):
+    id = models.AutoField(primary_key=True)
     department_name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.department_name
 
 class Position(models.Model):
+    id = models.AutoField(primary_key=True)
     position = models.CharField(max_length=255)
 
     def __str__(self):
         return self.position
 
 class LoansTaxes(models.Model):
+    id = models.AutoField(primary_key=True)
     name=models.CharField(max_length=255)
     amount=models.FloatField()
 
@@ -50,7 +53,7 @@ class Employee(models.Model):
     sample_loans=models.ManyToManyField(LoansTaxes,related_name="employee", through="Deductions")
     system_id=models.IntegerField(null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-
+    
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -71,6 +74,7 @@ class Deductions(models.Model):
     loanTaxes=models.ForeignKey(LoansTaxes, on_delete=models.CASCADE, null=True)
 
 class NightDifferential(models.Model):
+    id = models.AutoField(primary_key=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
     rate_multiplier = models.DecimalField(max_digits=5, decimal_places=2)  # Rate multiplier for night differential

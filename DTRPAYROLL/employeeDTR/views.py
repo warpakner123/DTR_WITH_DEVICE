@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Employee, DTR
+from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential
 from .forms import UploadFileForm, DTRForm
 from django.contrib import messages
 from computest import calculate_payroll
@@ -21,6 +21,9 @@ from django.template.loader import render_to_string
 import json
 import ast
 from django.utils.timezone import now
+from django.db.models import Count
+from django.db.models import ProtectedError
+
 
 def generate_pdf_payroll_view(request):
     try:
@@ -304,4 +307,312 @@ def edit_dtr(request, dtr_id):
     return render(request, 'edit_dtr.html', {'form': form})
 
 def profile(request):
-    return render(request, 'profile.html')
+    employees = Employee.objects.all()
+    departments = Department.objects.all()
+    positions = Position.objects.all()
+
+    for employee in employees:
+        employee.full_name = f"{employee.first_name} {employee.last_name}".title()
+        employee.department.department_name= employee.department.department_name.title()
+        employee.position.position = employee.position.position.title()
+    
+    for position in positions:
+        position.position = position.position.title()
+
+    for department in departments:
+        department.department_name = department.department_name.title()
+
+    context = {
+        'employees': employees,
+        "departments":departments,
+        "positions":positions,
+    }
+
+    return render(request, 'profile.html', context)
+
+def department(request):
+    if request.method == 'POST':
+        if 'add_department_submit' in request.POST:
+            department_name = request.POST.get('department_name')
+
+            if not department_name:
+                messages.error(request, 'Department name is required.')
+                return redirect('department')
+        
+            if Department.objects.filter(department_name__iexact=department_name).exists():
+                messages.error(request, 'A department with this name already exists.')
+                return redirect('department')
+            
+            try:
+                Department.objects.create(department_name=department_name )
+                messages.success(request, 'Department added successfully.')
+                return redirect('department')
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+                return redirect('department')
+        elif 'edit_department_submit' in request.POST:
+            department_id = request.POST.get('edit_department_id')
+            department_name = request.POST.get('edit_department_name')
+
+            if not department_name:
+                messages.error(request, 'Department name is required.')
+                return redirect('department')
+            
+            department = get_object_or_404(Department, pk=department_id)
+
+            if Department.objects.exclude(pk=department_id).filter(department_name__iexact=department_name).exists():
+                messages.error(request, 'A department with this name already exists.')
+                return redirect('department')
+            
+            try:
+                department.department_name = department_name
+                department.save()
+                messages.success(request, 'Department updated successfully.')
+                return redirect('department')
+            
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+                return redirect('department') 
+        elif 'delete_department_submit' in request.POST:
+            department_id = request.POST.get('delete_department_id')
+            
+            department = get_object_or_404(Department, pk=department_id)
+
+            if department.employee_set.exists():
+                messages.error(request, 'Cannot delete department. There are employees associated with it.')
+                return redirect('department')
+
+            try:
+                department.delete()
+                messages.success(request, 'Department deleted successfully.')
+                return redirect('department')
+            except ProtectedError as e:
+                messages.error(request, 'Cannot delete department. There are employees associated with it.')
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+
+                return redirect('department')
+        elif 'add_position_submit' in request.POST:
+            position_name = request.POST.get('position_name')
+
+            if not position_name:
+                messages.error(request, 'Position name is required.')
+                return redirect('department')
+        
+            if Position.objects.filter(position__iexact=position_name).exists():
+                messages.error(request, 'A position with this name already exists.')
+                return redirect('department')
+            
+            try:
+                Position.objects.create(position=position_name )
+                messages.success(request, 'Position added successfully.')
+                return redirect('department')
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+                return redirect('department')
+        elif 'edit_position_submit' in request.POST:
+            position_id = request.POST.get('edit_position_id')
+            position_name = request.POST.get('edit_position_name')
+
+            if not position_name:
+                messages.error(request, 'Position name is required.')
+                return redirect('department')
+            
+            position = get_object_or_404(Position, pk=position_id)
+
+            if Position.objects.exclude(pk=position_id).filter(position__iexact=position_name).exists():
+                messages.error(request, 'A position with this name already exists.')
+                return redirect('department')
+            
+            try:
+                position.position = position_name
+                position.save()
+                messages.success(request, 'Position updated successfully.')
+                return redirect('department')
+            
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+                return redirect('department')  
+        elif 'delete_position_submit' in request.POST:
+            position_id = request.POST.get('delete_position_id')
+            
+            position = get_object_or_404(Position, pk=position_id)
+
+            if position.employee_set.exists():
+                messages.error(request, 'Cannot delete position. There are employees associated with it.')
+                return redirect('department')
+
+            try:
+                position.delete()
+                messages.success(request, 'Position deleted successfully.')
+                return redirect('department')
+            except ProtectedError as e:
+                messages.error(request, 'Cannot delete position. There are employees associated with it.')
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+
+                return redirect('department')
+    else:
+        departments = Department.objects.annotate(total=Count('employee'),employees_list=Count('employee__id', distinct=True),)
+        positions = Position.objects.annotate(total=Count('employee'),employees_list=Count('employee__id', distinct=True),)
+
+        for position in positions:
+            position.position = position.position.title()
+            position.employees = position.employee_set.all()
+
+            for employee in position.employees:
+                employee.full_name = f"{employee.first_name} {employee.last_name}".title()
+                employee.department.department_name= employee.department.department_name.title()
+                employee.position.position = employee.position.position.title()
+
+        for department in departments:
+            department.department_name = department.department_name.title()
+            department.employees = department.employee_set.all()
+
+            for employee in department.employees:
+                employee.full_name = f"{employee.first_name} {employee.last_name}".title()
+                employee.department.department_name= employee.department.department_name.title()
+                employee.position.position = employee.position.position.title()
+
+        context = {
+            "departments":departments,
+            "positions":positions,
+        }
+        return render(request, 'department.html',context)
+
+def compensation(request):
+    if request.method == 'POST':
+        if 'add_loan_tax_submit' in request.POST:
+            name = request.POST.get('loan_tax_name')
+            amount = request.POST.get('loan_tax_amount')
+
+            if not all([name, amount]):
+                messages.error(request, 'All fields are required.')
+                return redirect('compensation')
+        
+            if LoansTaxes.objects.filter(name__iexact=name).exists():
+                messages.error(request, 'A loan/tax with this name already exists.')
+                return redirect('compensation')
+            
+            try:
+                LoansTaxes.objects.create(name=name, amount=amount )
+                messages.success(request, 'Loan/Taxes added successfully.')
+                return redirect('compensation')
+            
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+                return redirect('compensation')
+        elif 'edit_loan_tax_submit' in request.POST:
+            id = request.POST.get('edit_loan_tax_id')
+            name = request.POST.get('edit_loan_tax_name')
+            amount = request.POST.get('edit_loan_tax_amount')
+
+            if not all([name, amount]):
+                messages.error(request, 'All fields are required.')
+                return redirect('compensation')
+            
+            loans_taxes = get_object_or_404(LoansTaxes, pk=id)
+
+            if LoansTaxes.objects.exclude(pk=id).filter(name__iexact=name).exists():
+                messages.error(request, 'A loan/tax with this name already exists.')
+                return redirect('compensation')
+            
+            try:
+                loans_taxes.name = name
+                loans_taxes.amount = amount
+                loans_taxes.save()
+                messages.success(request, 'Loan/Tax updated successfully.')
+                return redirect('compensation')
+            
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+                return redirect('compensation') 
+        elif 'delete_loan_tax_submit' in request.POST:
+            id = request.POST.get('delete_loan_tax_id')
+            
+            loans_taxes = get_object_or_404(LoansTaxes, pk=id)
+
+            try:
+                loans_taxes.delete()
+                messages.success(request, 'Loan/Taxes deleted successfully.')
+                return redirect('compensation')
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+
+                return redirect('compensation')
+        elif 'add_night_diff_submit' in request.POST:
+            start_time = request.POST.get('night_diff_start_time')
+            end_time = request.POST.get('night_diff_end_time')
+            rate_multiplier = request.POST.get('night_diff_rate_multiplier')
+
+            if not all([start_time, end_time,rate_multiplier ]):
+                messages.error(request, 'All fields are required.')
+                return redirect('compensation')
+        
+            # Still need to be fixed
+            if NightDifferential.objects.filter(start_time__iexact=start_time, end_time=end_time).exists():
+                messages.error(request, 'A night differential with this time range already exists.')
+                return redirect('compensation')
+            
+            try:
+                NightDifferential.objects.create(start_time=start_time,end_time=end_time,rate_multiplier=rate_multiplier )
+                messages.success(request, 'Night Differential added successfully.')
+                return redirect('compensation')
+            
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+                return redirect('compensation')
+        elif 'edit_night_diff_submit' in request.POST:
+            id = request.POST.get('edit_night_diff_id')
+            start_time = request.POST.get('edit_night_diff_start_time')
+            end_time = request.POST.get('edit_night_diff_end_time')
+            rate_multiplier = request.POST.get('edit_night_diff_rate_multiplier')
+
+            if not all([start_time, end_time,rate_multiplier ]):
+                messages.error(request, 'All fields are required.')
+                return redirect('compensation')
+            
+            night_diffs = get_object_or_404(NightDifferential, pk=id)
+
+            # Still need to be fixed
+            print(start_time,end_time,night_diffs.end_time,night_diffs.start_time)
+            if NightDifferential.objects.filter(start_time__iexact=start_time, end_time=end_time).exists():
+                messages.error(request, 'A night differential with this time range already exists.')
+                return redirect('compensation')
+            
+            try:
+                night_diffs.start_time = start_time
+                night_diffs.end_time = end_time
+                night_diffs.rate_multiplier = rate_multiplier
+                night_diffs.save()
+                messages.success(request, 'Night Differential updated successfully.')
+                return redirect('compensation')
+            
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+                return redirect('compensation')  
+        elif 'delete_night_diff_submit' in request.POST:
+            id = request.POST.get('delete_night_diff_id')
+            
+            night_diffs = get_object_or_404(NightDifferential, pk=id)
+
+            try:
+                night_diffs.delete()
+                messages.success(request, 'Night Differential deleted successfully.')
+                return redirect('compensation')
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+
+                return redirect('compensation')
+    else:
+        loans_taxes = LoansTaxes.objects.annotate(total=Count('employee'),employees_list=Count('employee__id', distinct=True),)
+        night_diffs = NightDifferential.objects.all()
+
+        for loan_tax in loans_taxes:
+            loan_tax.name = loan_tax.name.title()
+            
+        context = {
+            "night_diffs":night_diffs,
+            "loans_taxes":loans_taxes,
+        }
+        return render(request, 'compensation.html', context)
