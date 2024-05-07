@@ -293,7 +293,6 @@ def logout_user(request):
     logout(request)
     return redirect('custom_login')
 
-
 def edit_dtr(request, dtr_id):
     dtr_instance = DTR.objects.get(pk=dtr_id)
     if request.method == 'POST':
@@ -316,9 +315,10 @@ def delete_dtr(request, dtr_id):
         return redirect('attendance')
 
 def profile(request):
-    employees = Employee.objects.all()
-    departments = Department.objects.all()
-    positions = Position.objects.all()
+    employees = Employee.objects.exclude(department__department_name__iexact='hr').exclude(department__department_name__iexact='hr').exclude(department__department_name__iexact='hr')
+    departments = Department.objects.exclude(department_name__iexact='hr')
+    positions = Position.objects.exclude(position__iexact='hr')
+
 
     for employee in employees:
         employee.full_name = f"{employee.first_name} {employee.last_name}".title()
@@ -338,6 +338,27 @@ def profile(request):
     }
 
     return render(request, 'profile.html', context)
+
+def edit_employee(request, employee_id):
+    employee = get_object_or_404(Employee, id=employee_id)
+    if request.method == 'POST':
+        # Handle form submission for editing employee details
+        # For example:
+        # employee.first_name = request.POST['first_name']
+        # employee.last_name = request.POST['last_name']
+        # Save the changes
+        # employee.save()
+        return redirect('profile')  # Redirect to profile page after editing
+    return render(request, 'edit_employee.html', {'employee': employee})
+
+def delete_employee(request, employee_id):
+    employee = get_object_or_404(Employee, id=employee_id)
+    if request.method == 'POST':
+        # Handle deletion of employee
+        employee.delete()
+        messages.success(request, 'Employee successfully removed!')
+        return redirect('profile')  # Redirect to profile page after deletion
+
 
 def department(request):
     if request.method == 'POST':
