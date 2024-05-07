@@ -520,6 +520,8 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     <!-- Fields for editing DTR entry -->
+                    <h6>Current Date-Time for Employee : {{dtr.employee.full_name}}</h6>
+                    <h6>{{dtr.datetime}}</h6>
                     <div class="form-group">
                         <label for="datetime" class="col-form-label">Date and Time:</label>
                         <input
@@ -527,9 +529,10 @@
                             class="form-control"
                             id="datetime"
                             name="datetime"
-                            value="{{ dtr.datetime }}"
+                            value="{{dtr.datetime}}"
                             required
                         />
+
                     </div>
                     <div class="form-group">
                         <label for="status" class="col-form-label">Type:</label>
