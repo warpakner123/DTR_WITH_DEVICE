@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential
-from .forms import UploadFileForm, DTRForm
+from .forms import AddEmployeeForm, EmployeeForm, UploadFileForm, DTRForm
 from django.contrib import messages
 from computest import calculate_payroll
 import pandas as pd
@@ -130,7 +130,7 @@ def attendance(request):
                 uploaded_file = request.FILES['excelFile']
 
                 try:
-                # Assuming the uploaded file is in Excel format
+                    # Assuming the uploaded file is in Excel format
                     df = pd.read_excel(uploaded_file)
 
                     # Iterate over each row in the DataFrame
@@ -208,6 +208,21 @@ def attendance(request):
             except Exception as e:
                 messages.error(request, f'An error occurred: {e}')
                 return redirect('attendance')
+        elif 'edit_dtr' in request.POST:
+            dtr_id = request.POST.get('dtr_id')
+            dtr_instance = get_object_or_404(DTR, pk=dtr_id)
+            form = DTRForm(request.POST, instance=dtr_instance)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'DTR entry successfully edited!')
+                return redirect('attendance')
+        elif 'delete_dtr' in request.POST:
+            dtr_id = request.POST.get('dtr_id')
+            dtr_instance = get_object_or_404(DTR, pk=dtr_id)
+            dtr_instance.delete()
+            messages.success(request, 'DTR entry successfully deleted!')
+            return redirect('attendance')
+
     else:
         form = UploadFileForm()
         dtrs = DTR.objects.all().order_by('-datetime')
@@ -293,72 +308,65 @@ def logout_user(request):
     logout(request)
     return redirect('custom_login')
 
-def edit_dtr(request, dtr_id):
-    dtr_instance = DTR.objects.get(pk=dtr_id)
-    if request.method == 'POST':
-        form = DTRForm(request.POST, instance=dtr_instance)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'DTR entry successfully edited!')
-            return redirect('attendance')
-    else:
-        form = DTRForm(instance=dtr_instance)
-    return render(request, 'edit_dtr.html', {'form': form})
-
-def delete_dtr(request, dtr_id):
-    dtr_instance = get_object_or_404(DTR, pk=dtr_id)
-    if request.method == 'POST':
-        # Delete the DTR instance
-        dtr_instance.delete()
-        messages.success(request, 'DTR entry successfully deleted!')
-        # Redirect the user to the appropriate page
-        return redirect('attendance')
-
 def profile(request):
-    employees = Employee.objects.exclude(department__department_name__iexact='hr').exclude(department__department_name__iexact='hr').exclude(department__department_name__iexact='hr')
-    departments = Department.objects.exclude(department_name__iexact='hr')
-    positions = Position.objects.exclude(position__iexact='hr')
-
-
-    for employee in employees:
-        employee.full_name = f"{employee.first_name} {employee.last_name}".title()
-        employee.department.department_name= employee.department.department_name.title()
-        employee.position.position = employee.position.position.title()
-
-    for position in positions:
-        position.position = position.position.title()
-
-    for department in departments:
-        department.department_name = department.department_name.title()
-
-    context = {
-        'employees': employees,
-        "departments":departments,
-        "positions":positions,
-    }
-
-    return render(request, 'profile.html', context)
-
-def edit_employee(request, employee_id):
-    employee = get_object_or_404(Employee, id=employee_id)
     if request.method == 'POST':
-        # Handle form submission for editing employee details
-        # For example:
-        # employee.first_name = request.POST['first_name']
-        # employee.last_name = request.POST['last_name']
-        # Save the changes
-        # employee.save()
-        return redirect('profile')  # Redirect to profile page after editing
-    return render(request, 'edit_employee.html', {'employee': employee})
+        if 'edit_employee' in request.POST:
+            form = EmployeeForm(request.POST)
+            if form.is_valid():
+                id = request.POST.get('id')
+                employee_id = request.POST.get('employee_id')
+                employee = get_object_or_404(Employee, id=id)
+                # Check if the employee_id has been changed
+                if employee.employee_id != employee_id:
+                    # Check if an employee with the same employee_id already exists
+                    existing_employee = Employee.objects.filter(employee_id=employee_id).exclude(id=id).first()
+                    if existing_employee:
+                        return HttpResponseBadRequest("Employee with this ID already exists!")
+                form = EmployeeForm(request.POST, instance=employee)
+                if form.is_valid():
+                    form.save()
+                    messages.success(request, 'Employee details updated successfully!')
+                    return redirect('profile')
+        elif 'delete_employee' in request.POST:
+            id = request.POST.get('id')
+            employee = get_object_or_404(Employee, id=id)
+            employee.delete()
+            messages.success(request, 'Employee successfully removed!')
+            return redirect('profile')
+        elif 'add_employee' in request.POST:
+            employee_id = request.POST.get('employee_id')
+            # Check if an employee with the same employee_id already exists
+            if Employee.objects.filter(employee_id=employee_id).exists():
+                return HttpResponseBadRequest("Employee with this ID already exists!")
+            form = AddEmployeeForm(request.POST)  # Instantiate the AddEmployeeForm with POST data
+            if form.is_valid():  # Validate the form
+                form.save()  # Save the form data to the database
+                messages.success(request, 'Employee successfully added!')  # Success message
+                return redirect('profile')  # Redirect to the profile page
+            else:
+                pass
+    else:
+        employees = Employee.objects.exclude(department__department_name__iexact='hr')
+        departments = Department.objects.exclude(department_name__iexact='hr')
+        positions = Position.objects.exclude(position__iexact='hr')
 
-def delete_employee(request, employee_id):
-    employee = get_object_or_404(Employee, id=employee_id)
-    if request.method == 'POST':
-        # Handle deletion of employee
-        employee.delete()
-        messages.success(request, 'Employee successfully removed!')
-        return redirect('profile')  # Redirect to profile page after deletion
+        for employee in employees:
+            employee.full_name = f"{employee.first_name} {employee.last_name}".title()
+            employee.department.department_name = employee.department.department_name.title()
+            employee.position.position = employee.position.position.title()
 
+        for position in positions:
+            position.position = position.position.title()
+
+        for department in departments:
+            department.department_name = department.department_name.title()
+
+        context = {
+            'employees': employees,
+            'departments': departments,
+            'positions': positions,
+        }
+        return render(request, 'profile.html', context)
 
 def department(request):
     if request.method == 'POST':

@@ -516,12 +516,13 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="{% url 'edit_dtr' dtr.id %}">
+            <form method="post">
                 {% csrf_token %}
                 <div class="modal-body">
                     <!-- Fields for editing DTR entry -->
                     <h6>Current Date-Time for Employee : {{dtr.employee.full_name}}</h6>
                     <h6>{{dtr.datetime}}</h6>
+                    <input type="hidden" name="dtr_id" value="{{ dtr.id }}">
                     <div class="form-group">
                         <label for="datetime" class="col-form-label">Date and Time:</label>
                         <input
@@ -557,6 +558,7 @@
                     </button>
                     <button
                         type="submit"
+                        name="edit_dtr"
                         class="btn bg-gradient-success"
                     >
                         Save Changes
@@ -591,11 +593,12 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="{% url 'delete_dtr' dtr.id %}">
+            <form method="post">
                 {% csrf_token %}
                 <div class="modal-body">
                     <p>Are you sure you want to delete this DTR entry for {{ dtr.employee.full_name }}?</p>
                 </div>
+                <input type="hidden" name="dtr_id" value="{{ dtr.id }}">
                 <div class="modal-footer">
                     <button
                         type="button"
@@ -606,6 +609,7 @@
                     </button>
                     <button
                         type="submit"
+                        name="delete_dtr"
                         class="btn bg-gradient-danger"
                     >
                         Delete

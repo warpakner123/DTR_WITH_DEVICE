@@ -51,9 +51,8 @@ class Employee(models.Model):
     employee_type = models.CharField(max_length=100, choices=EMP_TYPE_CHOICES, default="Part-Time")
     email = models.EmailField(max_length=255)
     sample_loans=models.ManyToManyField(LoansTaxes,related_name="employee", through="Deductions")
-    system_id=models.IntegerField(null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 

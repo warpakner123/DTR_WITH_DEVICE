@@ -237,6 +237,7 @@
                 class="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                onclick="resetForm({{ employee.id }})"
               >
                 <span aria-hidden="true">×</span>
               </button>
@@ -244,6 +245,21 @@
             <form method="post">
               {% csrf_token %}
               <div class="modal-body">
+                <div class="col-2">
+                    <label for="employee_id" class="col-form-label"
+                      >Employee ID:
+                      </label>
+                </div>
+                <div class="col-1">
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="employee_id"
+                      name="employee_id"
+                      required
+                      min="1"
+                    />
+                  </div>
                 <div class="form-group row">
                   <div class="col-6">
                     <label for="first_name" class="col-form-label"
@@ -307,40 +323,22 @@
                     <label for="first_name" class="col-form-label"
                       >Department:</label
                     >
-                    <select
-                      name="department"
-                      id="department"
-                      class="form-control mb-3"
-                      required
-                    >
-                      <option hidden value="" selected>
-                        No Department Selected
-                      </option>
-                      {% for department in departments %}
-                      <option value="{{ department.department_id }}">
-                        {{ department.department_name }}
-                      </option>
-                      {% endfor %}
+                    <select name="department" id="department" class="form-control mb-3" required>
+                        <option value="" selected disabled hidden>No Department Selected</option>
+                        {% for department in departments %}
+                            <option value="{{ department.id }}">{{ department.department_name }}</option>
+                        {% endfor %}
                     </select>
                   </div>
                   <div class="col-6">
                     <label for="position" class="col-form-label"
                       >Position:</label
                     >
-                    <select
-                      name="position"
-                      id="position"
-                      class="form-control mb-3"
-                      required
-                    >
-                      <option hidden value="" selected>
-                        No Position Selected
-                      </option>
-                      {% for position in positions %}
-                      <option value="{{ position.position_id }}">
-                        {{ position.position }}
-                      </option>
-                      {% endfor %}
+                    <select name="position" id="position" class="form-control mb-3" required>
+                        <option value="" selected disabled hidden>No Position Selected</option>
+                        {% for position in positions %}
+                            <option value="{{ position.id }}">{{ position.position }}</option>
+                        {% endfor %}
                     </select>
                   </div>
                 </div>
@@ -351,22 +349,26 @@
                     >
                     <input
                       type="number"
+                      step="0.01"
                       class="form-control"
                       id="hourly_rate"
                       name="hourly_rate"
                       required
+                      min="0"
                     />
                   </div>
                   <div class="col-6">
-                    <label for="overtime_rate" class="col-form-label"
+                    <label for="Overtime_rate" class="col-form-label"
                       >Overtime Rate:</label
                     >
                     <input
                       type="number"
+                      step="0.01"
                       class="form-control"
-                      id="overtime_rate"
-                      name="overtime_rate"
+                      id="Overtime_rate"
+                      name="Overtime_rate"
                       required
+                      min="0"
                     />
                   </div>
                 </div>
@@ -384,10 +386,10 @@
                       <option hidden value="" selected>
                         No Employee Type Selected
                       </option>
-                      <option value="full-time">Full-Time</option>
-                      <option value="part-time">Part-Time</option>
-                      <option value="flex-time">Flex-Time</option>
-                      <option value="project-based">Project-Based</option>
+                      <option value="Part-Time">Full-Time</option>
+                      <option value="Part-Time">Part-Time</option>
+                      <option value="Flex-Time">Flex-Time</option>
+                      <option value="Project-Based">Project-Based</option>
                     </select>
                   </div>
                   <div class="col-6">
@@ -414,7 +416,7 @@
                 </button>
                 <button
                   type="submit"
-                  name="manual_submit"
+                  name="add_employee"
                   class="btn bg-gradient-success"
                 >
                   Add
@@ -597,23 +599,17 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="{% url 'delete_employee' employee.id %}">
+            <form method="post">
                 {% csrf_token %}
                 <div class="modal-body">
                     <p>Are you sure you want to remove {{ employee.full_name }}?</p>
                 </div>
+                    <input type="hidden" name="id" value="{{ employee.id }}">
                 <div class="modal-footer">
-                    <button
-                        type="button"
-                        class="btn bg-gradient-secondary"
-                        data-bs-dismiss="modal"
-                    >
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">
                         Cancel
                     </button>
-                    <button
-                        type="submit"
-                        class="btn bg-gradient-danger"
-                    >
+                    <button type="submit" name="delete_employee" class="btn bg-gradient-danger">
                         Delete
                     </button>
                 </div>
@@ -623,7 +619,7 @@
 </div>
 {% endfor %}
 
-<!-- Edit Modals -->
+<!-- Edit Modal -->
 {% for employee in employees %}
 <div
   class="modal fade"
@@ -652,7 +648,39 @@
       <form method="post">
         {% csrf_token %}
         <div class="modal-body">
-          <!-- Input fields with employee data -->
+          <input type="hidden" name="id" value="{{ employee.id }}">
+          <input type="hidden" name="employee_id" value="{{ employee.employee_id }}">
+            <div class="form-group row">
+                <div class="col-2">
+                    <label for="employee_id" class="col-form-label">Employee ID:</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="employee_id{{ employee.id }}"
+                        name="employee_id"
+                        value="{{ employee.employee_id }}"
+                        required
+                        min="1"
+                    />
+                </div>
+                <div class="col-4">
+                    <label for="status" class="col-form-label">Active Status:</label>
+                    <select
+                        name="status"
+                        id="status{{ employee.id }}"
+                        class="form-control mb-3"
+                        required
+                    >
+                        <option hidden value="">Select Status</option>
+                        {% for value, label in employee.STATUS_CHOICES %}
+                            <option value="{{ value }}"
+                                {% if value == employee.status %} selected {% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
           <div class="form-group row">
             <div class="col-6">
               <label for="first_name" class="col-form-label">First Name:</label>
@@ -752,22 +780,26 @@
               <label for="hourly_rate" class="col-form-label">Hourly Rate:</label>
               <input
                   type="number"
+                  step="0.01"
                   class="form-control"
                   id="hourly_rate{{ employee.id }}"
                   name="hourly_rate"
                   value="{{ employee.hourly_rate }}"
                   required
+                  min="0"
               />
           </div>
           <div class="col-6">
               <label for="Overtime_rate" class="col-form-label">Overtime Rate:</label>
               <input
                   type="number"
+                  step="0.01"
                   class="form-control"
                   id="Overtime_rate{{ employee.id }}"
                   name="Overtime_rate"
                   value="{{ employee.Overtime_rate }}"
                   required
+                  min="0"
               />
           </div>
       </div>
@@ -781,10 +813,10 @@
                   required
               >
                   <option hidden value="" {% if not employee.employee_type %} selected {% endif %}>No Employee Type Selected</option>
-                  <option value="full-time" {% if employee.employee_type == "full-time" %} selected {% endif %}>Full-Time</option>
-                  <option value="part-time" {% if employee.employee_type == "part-time" %} selected {% endif %}>Part-Time</option>
-                  <option value="flex-time" {% if employee.employee_type == "flex-time" %} selected {% endif %}>Flex-Time</option>
-                  <option value="project-based" {% if employee.employee_type == "project-based" %} selected {% endif %}>Project-Based</option>
+                  <option value="Full-Time" {% if employee.employee_type == "Full-Time" %} selected {% endif %}>Full-Time</option>
+                  <option value="Part-Time" {% if employee.employee_type == "Part-Time" %} selected {% endif %}>Part-Time</option>
+                  <option value="Flex-Time" {% if employee.employee_type == "Flex-Time" %} selected {% endif %}>Flex-Time</option>
+                  <option value="Project-Based" {% if employee.employee_type == "Project-Based" %} selected {% endif %}>Project-Based</option>
               </select>
           </div>
           <div class="col-6">
@@ -810,10 +842,10 @@
                 </button>
                 <button
                   type="submit"
-                  name="manual_submit"
+                  name="edit_employee"
                   class="btn bg-gradient-success"
                 >
-                  Add
+                  Update
                 </button>
               </div>
             </form>
@@ -821,5 +853,250 @@
         </div>
       </div>
 {% endfor %}
+
+<!-- View Modal -->
+{% for employee in employees %}
+<div
+  class="modal fade"
+  id="viewModal{{ employee.id }}"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewModalTitle{{ employee.id }}"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="right:0;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewModalTitle{{ employee.id }}">
+          View Employee Profile
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <!-- Form with Employee Data -->
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="id" value="{{ employee.id }}">
+          <input type="hidden" name="employee_id" value="{{ employee.employee_id }}">
+          <div class="form-group row">
+                <div class="col-2">
+                    <label for="employee_id" class="col-form-label">Employee ID:</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="employee_id{{ employee.id }}"
+                        name="employee_id"
+                        value="{{ employee.employee_id }}"
+                        required
+                        min="1"
+                        disabled
+                    />
+                </div>
+                <div class="col-4">
+                    <label for="status" class="col-form-label">Active Status:</label>
+                    <select
+                        name="status"
+                        id="status{{ employee.id }}"
+                        class="form-control mb-3"
+                        required
+                        disabled
+                    >
+                        <option hidden value="">Select Status</option>
+                        {% for value, label in employee.STATUS_CHOICES %}
+                            <option value="{{ value }}"
+                                {% if value == employee.status %} selected {% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+          <div class="form-group row">
+            <div class="col-6">
+              <label for="first_name" class="col-form-label">First Name:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="first_name{{ employee.id }}"
+                name="first_name"
+                value="{{ employee.first_name }}"
+                disabled
+              />
+            </div>
+            <div class="col-6">
+              <label for="last_name" class="col-form-label">Last Name:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="last_name{{ employee.id }}"
+                name="last_name"
+                value="{{ employee.last_name }}"
+                disabled
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+          <div class="col-6">
+              <label for="email" class="col-form-label">Email:</label>
+              <input
+                  type="email"
+                  class="form-control"
+                  id="email{{ employee.id }}"
+                  name="email"
+                  value="{{ employee.email }}"
+                  disabled
+              />
+          </div>
+          <div class="col-6">
+              <label for="dob" class="col-form-label">Date of Birth:</label>
+              <input
+                  type="date"
+                  class="form-control"
+                  id="dob{{ employee.id }}"
+                  name="dob"
+                  value="{{ employee.dob|date:'Y-m-d' }}"
+                  disabled
+              />
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="address" class="col-form-label">Address:</label>
+          <input
+              type="text"
+              class="form-control"
+              id="address{{ employee.id }}"
+              name="address"
+              value="{{ employee.address }}"
+              disabled
+          />
+      </div>
+      <div class="form-group row">
+          <div class="col-6">
+              <label for="department" class="col-form-label">Department:</label>
+              <select
+                  name="department"
+                  id="department{{ employee.id }}"
+                  class="form-control mb-3"
+                  disabled
+              >
+                  <option hidden value="">No Department Selected</option>
+                  {% for department in departments %}
+                      <option value="{{ department.id }}"
+                          {% if department.id == employee.department.id %} selected {% endif %}>
+                          {{ department.department_name }}
+                      </option>
+                  {% endfor %}
+              </select>
+          </div>
+          <div class="col-6">
+              <label for="position" class="col-form-label">Position:</label>
+              <select
+                  name="position"
+                  id="position{{ employee.id }}"
+                  class="form-control mb-3"
+                  disabled
+              >
+                  <option hidden value="" selected>No Position Selected</option>
+                  {% for position in positions %}
+                  <option value="{{ position.id }}"
+                      {% if position.id == employee.position.id %} selected {% endif %}>
+                      {{ position.position }}
+                  </option>
+                  {% endfor %}
+              </select>
+          </div>
+      </div>
+      <div class="form-group row">
+          <div class="col-6">
+              <label for="hourly_rate" class="col-form-label">Hourly Rate:</label>
+              <input
+                  type="number"
+                  step="0.01"
+                  class="form-control"
+                  id="hourly_rate{{ employee.id }}"
+                  name="hourly_rate"
+                  value="{{ employee.hourly_rate }}"
+                  disabled
+              />
+          </div>
+          <div class="col-6">
+              <label for="Overtime_rate" class="col-form-label">Overtime Rate:</label>
+              <input
+                  type="number"
+                  step="0.01"
+                  class="form-control"
+                  id="Overtime_rate{{ employee.id }}"
+                  name="Overtime_rate"
+                  value="{{ employee.Overtime_rate }}"
+                  disabled
+              />
+          </div>
+      </div>
+      <div class="form-group row">
+          <div class="col-6">
+              <label for="employee_type" class="col-form-label">Employee Type:</label>
+              <select
+                  name="employee_type"
+                  id="employee_type{{ employee.id }}"
+                  class="form-control mb-3"
+                  disabled
+              >
+                  <option hidden value="" {% if not employee.employee_type %} selected {% endif %}>No Employee Type Selected</option>
+                  <option value="Full-Time" {% if employee.employee_type == "Full-Time" %} selected {% endif %}>Full-Time</option>
+                  <option value="Part-Time" {% if employee.employee_type == "Part-Time" %} selected {% endif %}>Part-Time</option>
+                  <option value="Flex-Time" {% if employee.employee_type == "Flex-Time" %} selected {% endif %}>Flex-Time</option>
+                  <option value="Project-Based" {% if employee.employee_type == "Project-Based" %} selected {% endif %}>Project-Based</option>
+              </select>
+          </div>
+          <div class="col-6">
+              <label for="date_hired" class="col-form-label">Date Hired:</label>
+              <input
+                  type="date"
+                  class="form-control"
+                  id="date_hired{{ employee.id }}"
+                  name="date_hired"
+                  value="{% if employee.date_hired %}{{ employee.date_hired|date:"Y-m-d" }}{% endif %}"
+                  disabled
+              />
+          </div>
+      </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn bg-gradient-secondary"
+                  data-bs-dismiss="modal"
+                  onclick="resetForm({{ employee.id }})"
+                >
+                  Close
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+{% endfor %}
+
+<script>
+// Reset form fields when modal is shown
+document.addEventListener('DOMContentLoaded', function () {
+  var modals = document.querySelectorAll('.modal');
+  modals.forEach(function (modal) {
+    modal.addEventListener('show.bs.modal', function () {
+      var form = modal.querySelector('form');
+      if (form) {
+        form.reset();
+      }
+    });
+  });
+});
+</script>
 
 </html>
