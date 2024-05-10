@@ -233,7 +233,7 @@ def attendance(request):
             dtr.employee.department.department_name= emp.department.department_name.title()
             dtr.employee.position.position = emp.position.position.title()
             dtr.datetime = dtr.datetime.strftime('%B %d, %Y %I:%M %p')
-        employees = Employee.objects.filter(status=1,department_id=1) #update to dynamic
+        employees = Employee.objects.filter(status=1).exclude(department__department_name__iexact='hr')
         for employee in employees:
             employee.full_name = f"{employee.first_name} {employee.last_name}".title()
 
@@ -296,7 +296,7 @@ def payroll(request):
             messages.error(request, f'An error occurred: {str(e)}')
             return redirect('payroll')
 
-    employees = Employee.objects.filter(department_id=1)
+    employees = Employee.objects.filter(status=1).exclude(department__department_name__iexact='hr')
     for employee in employees:
         employee.full_name = f"{employee.first_name} {employee.last_name}".title()
         employee.department.department_name= employee.department.department_name.title()
