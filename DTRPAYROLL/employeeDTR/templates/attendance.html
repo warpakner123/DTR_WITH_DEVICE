@@ -319,7 +319,7 @@
             <div class="col">
               <h5 class="mb-1">Choose file to upload:</h5>
               <p class="mb-0 font-weight-bold text-sm">
-                Supported formats: (xls)
+                Supported formats: (xls/xlsx)
               </p>
             </div>
             <div class="col-md-auto">
@@ -387,7 +387,7 @@
                         <th
                           class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                         >
-                          Datetime
+                          Date - time
                         </th><th
                           class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                         >
@@ -462,6 +462,23 @@
                       {% endfor %}
                     </tbody>
                   </table>
+                </div>
+                <div class="pagination justify-content-center mt-4">
+                    <span class="step-links">
+                        {% if dtrs.has_previous %}
+                            <a href="?page=1">&laquo; First</a>
+                            <a href="?page={{ dtrs.previous_page_number }}">Previous</a>
+                        {% endif %}
+
+                        <span class="current">
+                            Page {{ dtrs.number }} of {{ dtrs.paginator.num_pages }}
+                        </span>
+
+                        {% if dtrs.has_next %}
+                            <a href="?page={{ dtrs.next_page_number }}">Next</a>
+                            <a href="?page={{ dtrs.paginator.num_pages }}">Last &raquo;</a>
+                        {% endif %}
+                    </span>
                 </div>
               </div>
             </div>

@@ -23,6 +23,9 @@ import ast
 from django.utils.timezone import now
 from django.db.models import Count
 from django.db.models import ProtectedError
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 
 
 def generate_pdf_payroll_view(request):
@@ -237,7 +240,20 @@ def attendance(request):
         for employee in employees:
             employee.full_name = f"{employee.first_name} {employee.last_name}".title()
 
-        return render(request, 'attendance.html', {'form': form, "dtrs":dtrs, "employees":employees})
+        # Paginate the queryset
+        paginator = Paginator(dtrs, 10)  # Change 10 to the number of items per page you want
+        page = request.GET.get('page')
+        try:
+            dtrs = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            dtrs = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range, deliver last page of results.
+            dtrs = paginator.page(paginator.num_pages)
+
+        # Pass the paginated queryset to the template
+        return render(request, 'attendance.html', {'form': form, 'dtrs': dtrs, 'employees': employees})
 
 def payroll(request):
     if request.method == 'POST':
