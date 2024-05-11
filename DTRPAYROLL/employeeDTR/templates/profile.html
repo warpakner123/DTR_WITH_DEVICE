@@ -242,7 +242,7 @@
                 <span aria-hidden="true">×</span>
               </button>
             </div>
-            <form method="post">
+            <form method="post" id="employee_form">
               {% csrf_token %}
               <div class="modal-body">
                 <div class="col-2">
@@ -403,6 +403,18 @@
                       name="date_hired"
                       required
                     />
+                  </div>
+                </div>
+                <!-- Added Deductions row -->
+                <div class="form-group row">
+                  <div class="col-6">
+                    <button
+                  type="button"
+                  name="add_deductions"
+                  class="btn bg-gradient-primary"
+                >
+                  Add Deductions
+                </button>
                   </div>
                 </div>
               </div>
@@ -1098,5 +1110,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 </script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#add_deductions').click(function(){
+                $('#employee_form').append('<input type="text" name="additional_field">');
+            });
+        });
+    </script>
 
 </html>
