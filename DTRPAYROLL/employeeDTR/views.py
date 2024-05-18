@@ -421,6 +421,7 @@ def profile(request):
         employees = Employee.objects.exclude(department__department_name__iexact='hr')
         departments = Department.objects.exclude(department_name__iexact='hr')
         positions = Position.objects.exclude(position__iexact='hr')
+        loans_taxes = LoansTaxes.objects.all()
 
         for employee in employees:
             employee.full_name = f"{employee.first_name} {employee.last_name}".title()
@@ -433,10 +434,14 @@ def profile(request):
         for department in departments:
             department.department_name = department.department_name.title()
 
+        for loan_tax in loans_taxes:
+            loan_tax.name = loan_tax.name.title()
+
         context = {
             'employees': employees,
             'departments': departments,
             'positions': positions,
+            'loans_taxes': loans_taxes,
         }
         return render(request, 'profile.html', context)
 

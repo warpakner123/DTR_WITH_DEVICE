@@ -407,18 +407,21 @@
                     />
                   </div>
                 </div>
-                <!-- Added Deductions row -->
                 <div class="form-group row">
                   <div class="col-6">
                     <button
-                  type="button"
-                  name="add_deductions"
-                  class="btn bg-gradient-primary"
-                >
-                  Add Deductions
-                </button>
+                      type="button"
+                      name="add_deductions"
+                      class="btn bg-gradient-primary"
+                      id="addDeductionsBtn"
+                    >
+                      Add Deductions
+                    </button>
                   </div>
                 </div>
+
+                <!-- Container to hold dynamically added form groups -->
+                <div id="deductionsContainer"></div>
               </div>
               <div class="modal-footer">
                 <button
@@ -569,6 +572,90 @@
 
       <div class="container-fluid py-4"></div>
     </main>
+
+
+    <script>
+      let deductionCount = 0;
+      const maxDeductions = 3; // Change this according to your requirement
+
+      document.getElementById('addDeductionsBtn').addEventListener('click', function() {
+        if (deductionCount < maxDeductions) {
+          // Create a new div for the form group
+          var newFormGroup = document.createElement('div');
+          newFormGroup.className = 'form-group row';
+
+          // Create the label and select container div
+          var selectContainer = document.createElement('div');
+          selectContainer.className = 'col-6';
+
+          // Create the label
+          var newLabel = document.createElement('label');
+          newLabel.setAttribute('for', 'deductions_' + deductionCount);
+          newLabel.innerText = 'Deductions:';
+
+          // Create the select element
+          var newSelect = document.createElement('select');
+          newSelect.id = 'deductions_' + deductionCount; // Unique ID for each select element
+          newSelect.name = 'deductions_' + deductionCount; // Unique name for each select element
+          newSelect.className = 'form-control mb-3';
+
+          // Add the default option
+          var defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.selected = true;
+          defaultOption.disabled = true;
+          defaultOption.hidden = true;
+          defaultOption.innerText = 'No Deduction Selected';
+          newSelect.appendChild(defaultOption);
+
+          // Add options dynamically from the loans_taxes variable
+          {% for loan_tax in loans_taxes %}
+            var option = document.createElement('option');
+            option.value = "{{ loan_tax.id }}";
+            option.innerText = "{{ loan_tax.name }}";
+            newSelect.appendChild(option);
+          {% endfor %}
+
+          // Append label and select to the select container
+          selectContainer.appendChild(newLabel);
+          selectContainer.appendChild(newSelect);
+
+          // Create the remove button container div
+          var buttonContainer = document.createElement('div');
+          buttonContainer.className = 'col-6';
+
+          // Create the remove button
+          var removeButton = document.createElement('button');
+          removeButton.type = 'button';
+          removeButton.className = 'btn btn-danger remove-deduction';
+          removeButton.innerText = 'Remove';
+
+          // Append remove button to the button container
+          buttonContainer.appendChild(removeButton);
+
+          // Append the select container and button container to the new form group
+          newFormGroup.appendChild(selectContainer);
+          newFormGroup.appendChild(buttonContainer);
+
+          // Append the new form group to the container
+          document.getElementById('deductionsContainer').appendChild(newFormGroup);
+
+          // Increment the counter
+          deductionCount++;
+        } else {
+          alert('You can only add up to 3 deductions.');
+        }
+      });
+
+      // Event delegation to handle removing form groups
+      document.getElementById('deductionsContainer').addEventListener('click', function(event) {
+        if (event.target && event.target.classList.contains('remove-deduction')) {
+          event.target.closest('.form-group').remove();
+          deductionCount--;
+        }
+      });
+    </script>
+
 
     <!--   Core JS Files   -->
     <script src="{% static 'js/core/popper.min.js' %}"></script>
