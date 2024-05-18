@@ -19,7 +19,7 @@ def print_loans_taxes_data(employee):
     loans_taxes = Deductions.objects.filter(employee=employee)
     for deduction in loans_taxes:
         loan_tax = deduction.loanTaxes
-        print(f"{loan_tax.name} : ₱{loan_tax.amount:.2f}")
+        print(f"{loan_tax.name} : {loan_tax.amount:.2f}")
 
 def calculate_hours_for_day(dtr_entries):
     """Calculate regular and overtime hours for a given day."""
@@ -120,17 +120,18 @@ def calculate_payroll(dtr_records, start_date, end_date, deduct):
             'pay_period': period,
             'period_start': start_date.strftime("%Y-%m-%d"),
             'period_end': period_end.strftime("%Y-%m-%d"),
-            'total_hours_worked': total_regular_hours + total_overtime_hours,
-            'regular_hours': total_regular_hours,
-            'overtime_hours': total_overtime_hours,
-            'gross_pay_regular': gross_pay_regular,
-            'gross_pay_overtime': gross_pay_overtime,
-            'gross_pay': gross_pay_regular + gross_pay_overtime,
-            'deductions_details': [{'name': deduction.loanTaxes.name, 'amount': deduction.loanTaxes.amount} for deduction in Deductions.objects.filter(employee=employee)],
-            'total_deductions': total_deductions,
-            'net_pay': net_pay,
+            'total_hours_worked': f"{total_regular_hours + total_overtime_hours:.2f}",
+            'regular_hours': f"{total_regular_hours:.2f}",
+            'overtime_hours': f"{total_overtime_hours:.2f}",
+            'gross_pay_regular': f" {gross_pay_regular:.2f}",
+            'gross_pay_overtime': f" {gross_pay_overtime:.2f}",
+            'gross_pay': f" {gross_pay_regular + gross_pay_overtime:.2f}",
+            'deductions_details': [{'name': deduction.loanTaxes.name, 'amount': f" {deduction.loanTaxes.amount:.2f}"} for deduction in Deductions.objects.filter(employee=employee)],
+            'total_deductions': f" {total_deductions:.2f}",
+            'net_pay': f" {net_pay:.2f}",
             'deduct': deduct,
         })
+
 
         payroll_data_json = json.dumps(payroll_data, ensure_ascii=False)
         return payroll_data_json
