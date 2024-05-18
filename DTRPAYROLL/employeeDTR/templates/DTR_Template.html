@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="{% static 'img/apple-icon.png' %}"
+    />
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
+    <title>Payroll | Payslip</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+    <script
+      src="https://kit.fontawesome.com/42d5adcbca.js"
+      crossorigin="anonymous"
+    ></script>
+    <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+    <link
+      id="pagestyle"
+      href="{% static 'css/argon-dashboard.css' %}"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.datatables.net/2.0.7/css/dataTables.bootstrap5.css"
+      rel="stylesheet"
+    />
+    <style>
+      table.dataTable thead th {
+        border: 2px solid #f0f2f4; /* Change the border color and width */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>PaySlip Results</h1>
+
+    <main class="main-content position-relative max-height-vh-100 h-100">
+      <div class="card shadow-lg mx-4 card-profile-bottom">
+        <div class="card-body p-5">
+          <div class="row gx-4 align-items-start">
+            <div class="col">
+              <h5 class="mb-6">Generate DTR</h5>
+              <table class="table table-bordered align-items-left mb-6 mt-4">
+                <thead class="align-items-left">
+                  <tr>
+                    <th
+                      class="text-secondary text-sm font-weight-bolder opacity-7"
+                    >
+                      Employee
+                    </th>
+                    <th class="text-uppercase text-sm">{{employee_name}}</th>
+                    <th
+                      class="text-secondary text-sm font-weight-bolder opacity-7"
+                    >
+                      Position
+                    </th>
+                    <th class="text-uppercase text-sm">
+                      {{employee.position.position}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th
+                      class="px-4 py-3 text-secondary text-sm font-weight-bolder opacity-7"
+                    >
+                      Office/Department
+                    </th>
+                    <th class="px-4 py-3 text-uppercase text-sm">
+                      {{employee.department.department_name}}
+                    </th>
+                    <th
+                      class="px-4 py-3 text-secondary text-sm font-weight-bolder opacity-7"
+                    >
+                      Period
+                    </th>
+                    <th class="px-4 py-3 text-uppercase text-sm">{{period}}</th>
+                  </tr>
+                </tbody>
+              </table>
+              {% comment %}
+              <div class="table-responsive p-0">
+                <table
+                  id="dtrTable"
+                  style="width: 100%"
+                  class="table table-striped table-bordered table-hover align-items-left mb-0 mt-4"
+                >
+                  <thead class="align-items-left">
+                    <tr>
+                      <th
+                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Day
+                      </th>
+                      <th
+                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Date
+                      </th>
+                      <th
+                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Time
+                      </th>
+                      <th
+                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Mode
+                      </th>
+                      <th
+                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Remarks
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for data in dtr_data %}
+                    <tr>
+                      <td class="align-middle text-sm mb-0">{{data.day}}</td>
+                      <td class="align-middle text-sm mb-0">{{data.date}}</td>
+                      <td class="align-middle text-sm mb-0">{{data.time}}</td>
+                      <td class="align-middle text-sm mb-0">
+                        {% if data.status == "C/In" %} In {% else %} Out {%
+                        endif %}
+                      </td>
+                      <td class="align-middle text-sm">
+                        {% if data.status == "C/In" %}
+                        <span class="badge badge-sm bg-gradient-success">
+                          CHECK-IN
+                        </span>
+                        {% else %}
+                        <span class="badge badge-sm bg-gradient-danger">
+                          CHECK-OUT
+                        </span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% endcomment %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!--   Core JS Files   -->
+    <script src="{% static 'js/core/popper.min.js' %}"></script>
+    <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/plugins/perfect-scrollbar.min.js' %}"></script>
+    <script src="{% static 'js/plugins/smooth-scrollbar.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
+    <script>
+      var win = navigator.platform.indexOf("Win") > -1;
+      if (win && document.querySelector("#sidenav-scrollbar")) {
+        var options = {
+          damping: "0.5",
+        };
+        Scrollbar.init(document.querySelector("#sidenav-scrollbar"), options);
+      }
+    </script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script src="{% static 'js/argon-dashboard.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.js"></script>
+    <script>
+      new DataTable("#dtrTable");
+    </script>
+  </body>
+</html>

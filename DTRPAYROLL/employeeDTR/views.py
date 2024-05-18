@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential
 from .forms import AddEmployeeForm, EmployeeForm, UploadFileForm, DTRForm
 from django.contrib import messages
-from computest import calculate_payroll
+from computest import calculate_payroll, format_dates
 import pandas as pd
 from django.utils import timezone
 import logging
@@ -24,8 +24,12 @@ from django.utils.timezone import now
 from django.db.models import Count
 from django.db.models import ProtectedError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
 
-
+# from django.shortcuts import render
+# from django.http import HttpResponse
+# from django.template.loader import get_template
+# from weasyprint import HTML
 
 
 def generate_pdf_payroll_view(request):
@@ -67,6 +71,51 @@ def generate_pdf_payroll_view(request):
     except Exception as e:
         logging.error(f"Unexpected error in PDF generation: {e}")
         return HttpResponse("Error generating PDF.")
+
+def generate_pdf_dtr_view(request):
+    try:
+        if request.method == 'POST':
+            # Get the payroll data from the POST request
+            dtr_data = request.POST.get('dtr_data', '')
+            period = request.POST.get('period', '')
+            employee = request.POST.get('employee', '')
+            employee_name = request.POST.get('employee_name', '')
+
+            # Ensure that we have data to put into our context
+            if not all([dtr_data, period, employee, employee_name]):
+                raise ValueError("No DTR data provided.")
+
+           # If we have a string, try to safely convert it to a Python object
+            # if isinstance(payroll_data_literal, str):
+            #     try:
+            #         PaySlip_Data = ast.literal_eval(payroll_data_literal)
+            #     except (ValueError, SyntaxError) as e:
+            #         logging.error(f"Error converting string to Python object: {e}")
+            #         return HttpResponse("Error parsing PaySlip data.")
+            # else:
+            #     # If it's not a string, then use it as is (should be a dictionary)
+            #     PaySlip_Data = payroll_data_literal
+
+            # Render the HTML template with the PaySlip data
+            # template = get_template('DTR_Template.html')
+            # html_content  = template.render({'dtr_data': dtr_data,"period":period, "employee":employee, "employee_name":employee_name})
+            # pdf_file = HTML(string=html_content).write_pdf()
+
+            # # Generate PDF
+            # response = HttpResponse(pdf_file, content_type='application/pdf')
+            # response['Content-Disposition'] = 'inline; filename="document.pdf"'
+
+            # if result.err:
+            #     logging.error(f"Error in PDF generation: {result.err}")
+            #     return HttpResponse("Error generating PDF.")
+
+            # return response
+        else:
+            return HttpResponse("Invalid request method.")
+    except Exception as e:
+        logging.error(f"Unexpected error in PDF generation: {e}")
+        return HttpResponse("Error generating PDF.")
+
 
 def custom_login(request):
     if request.user.is_authenticated:
@@ -263,6 +312,7 @@ def payroll(request):
         end_date = request.POST.get('end_date')
         deduct = request.POST.get('deductions')
 
+        print(start_date,end_date)
         if not all([employee_id, start_date, end_date]):
             messages.error(request, 'All fields are required.')
             return redirect('payroll')
@@ -280,12 +330,12 @@ def payroll(request):
             start_date = datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0)
             end_date = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1, seconds=-1)
 
-            if action == 'payslip':
-                dtr_records = DTR.objects.filter(number=employee_id, datetime__range=[start_date, end_date])
-                if not dtr_records.exists():
-                    messages.error(request, 'No DTR records found for the selected employee and date range.')
-                    return redirect('payroll')
+            dtr_records = DTR.objects.filter(number=employee_id, datetime__range=[start_date, end_date])
+            if not dtr_records.exists():
+                messages.error(request, 'No DTR records found for the selected employee and date range.')
+                return redirect('payroll')
 
+            if action == 'payslip':
                 payroll_data_json = calculate_payroll(dtr_records, start_date, end_date, deduct)
                 payroll_data = json.loads(payroll_data_json)
 
@@ -295,11 +345,17 @@ def payroll(request):
                     'PaySlip_Data': payroll_data[0] if payroll_data else {}
                 })
             elif action == 'dtr':
-                # Implement logic for generating DTR
-                # dtr_data = calculate_dtr(employee_id, start_date, end_date)
+                period = format_dates(start_date,end_date)
+                for dtr in dtr_records:
+                    dtr.day = dtr.datetime.strftime('%a')
+                    dtr.date = dtr.datetime.strftime('%d/%m/%Y')
+                    dtr.time = dtr.datetime.strftime('%I:%M %p')
+
                 return render(request, 'generate_dtr.html', {
-                    # 'dtr_data': dtr_data,
-                    'employee_name': f"{employee.first_name} {employee.last_name}"
+                    'dtr_data': dtr_records,
+                    'employee_name': f"{employee.first_name} {employee.last_name}",
+                    "employee" : employee,
+                    "period" : period
                 })
 
         except Employee.DoesNotExist:
