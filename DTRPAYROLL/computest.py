@@ -5,6 +5,7 @@ from datetime import datetime, date
 from collections import defaultdict
 import calendar
 import json
+from datetime import datetime
 
 # Setup Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
@@ -133,3 +134,27 @@ def calculate_payroll(dtr_records, start_date, end_date, deduct):
 
         payroll_data_json = json.dumps(payroll_data, ensure_ascii=False)
         return payroll_data_json
+
+def format_dates(date1, date2):
+    # Ensure input dates are datetime objects
+    if isinstance(date1, str):
+        date1 = datetime.strptime(date1, "%Y-%m-%d")
+    if isinstance(date2, str):
+        date2 = datetime.strptime(date2, "%Y-%m-%d")
+
+    date_format = "%b %d, %Y"  # Example: Jan 01, 2024
+
+    if date1.year == date2.year:
+        if date1.month == date2.month:
+            if date1.day == date2.day:
+                # Same day (e.g., Jan 01, 2024)
+                return date1.strftime(date_format)
+            else:
+                # Same month and year (e.g., Jan 01 - 31, 2024)
+                return f"{date1.strftime('%b %d')} - {date2.strftime('%d')}, {date1.year}"
+        else:
+            # Different months but same year (e.g., Jan 01 - Dec 01, 2024)
+            return f"{date1.strftime('%b %d')} - {date2.strftime('%b %d')}, {date1.year}"
+    else:
+        # Different months and years (e.g., Jan 01, 2023 - Dec 01, 2024)
+        return f"{date1.strftime(date_format)} - {date2.strftime(date_format)}"

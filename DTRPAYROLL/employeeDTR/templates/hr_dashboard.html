@@ -21,6 +21,14 @@
     />
     <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
     <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.datatables.net/2.0.7/css/dataTables.bootstrap5.css"
+      rel="stylesheet"
+    />
     <script
       src="https://kit.fontawesome.com/42d5adcbca.js"
       crossorigin="anonymous"
@@ -308,15 +316,18 @@
             </div>
           </div>
         </div>
-        <div class="row py-5">
+        <div class="row pt-5">
           <div class="col-12">
             <div class="card mb-4">
               <div class="card-header pb-0">
                 <h6>Employee List</h6>
               </div>
-              <div class="card-body px-0 pt-0 pb-2">
+              <div class="card-body px-0 pt-0 pb-2 m-4">
                 <div class="table-responsive p-0">
-                  <table class="table align-items-center mb-0">
+                  <table
+                    id="employeeTable"
+                    class="table table-striped table-bordered table-hover align-items-center mb-0"
+                  >
                     <thead>
                       <tr>
                         <th
@@ -387,6 +398,7 @@
                       </tr>
                       {% endfor %}
                     </tbody>
+                    <tfoot></tfoot>
                   </table>
                 </div>
               </div>
@@ -413,5 +425,14 @@
     </script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="{% static 'js/argon-dashboard.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.js"></script>
+    <script>
+      new DataTable("#employeeTable");
+    </script>
   </body>
 </html>
