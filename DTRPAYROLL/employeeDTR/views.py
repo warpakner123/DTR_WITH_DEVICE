@@ -182,17 +182,14 @@ def attendance(request):
                 uploaded_file = request.FILES['excelFile']
 
                 try:
-                    # Assuming the uploaded file is in Excel format
                     df = pd.read_excel(uploaded_file)
 
-                    # Iterate over each row in the DataFrame
                     for index, row in df.iterrows():
                         department = row['Department']
                         name = row['Name']
-                        number = row['No.']  # Assuming 'No.' corresponds to employee_id
+                        number = row['No.']
                         datetime_str = row['Date/Time']
 
-                        # Convert datetime_str to a timezone-aware datetime object
                         if isinstance(datetime_str, pd.Timestamp):
                             datetime_obj = datetime_str.to_pydatetime()
                         else:
@@ -205,23 +202,25 @@ def attendance(request):
                         location_id = row['Location ID']
                         id_number = row['ID Number'] if not pd.isna(row['ID Number']) else None
 
-                        # Create and save a DTR instance
-                        dtr_instance = DTR.objects.create(
-                            department=department,
-                            name=name,
-                            number=number,
-                            datetime=datetime_obj,
-                            status=status,
-                            location_id=location_id,
-                            id_number=id_number,
-                        )
+                        try:
+                            employee = Employee.objects.get(employee_id=number)
+                            DTR.objects.create(
+                                department=department,
+                                name=name,
+                                number=number,
+                                datetime=datetime_obj,
+                                status=status,
+                                location_id=location_id,
+                                id_number=id_number,
+                            )
+                        except Employee.DoesNotExist:
+                            messages.error(request, f'Employee with ID {number} not found.')
 
-                    # You may add any additional processing or validation here
                     messages.success(request, 'Excel file uploaded and processed successfully.')
                 except Exception as e:
-                    # If an error occurs, add an error message
                     messages.error(request, f'An error occurred: {e}')
                 return redirect('attendance')
+
         elif 'manual_submit' in request.POST:
             number = request.POST.get('employee')
             datetime_str = request.POST.get('datetime')
@@ -234,10 +233,10 @@ def attendance(request):
             try:
                 datetime_obj = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
                 employee = Employee.objects.get(employee_id=number)
-                department=employee.department.department_name
-                name=f"{employee.first_name} {employee.last_name}".title()
-                location_id=0
-                id_number=None
+                department = employee.department.department_name
+                name = f"{employee.first_name} {employee.last_name}".title()
+                location_id = 0
+                id_number = None
 
                 DTR.objects.create(
                     department=department,
@@ -260,6 +259,7 @@ def attendance(request):
             except Exception as e:
                 messages.error(request, f'An error occurred: {e}')
                 return redirect('attendance')
+
         elif 'edit_dtr' in request.POST:
             dtr_id = request.POST.get('dtr_id')
             dtr_instance = get_object_or_404(DTR, pk=dtr_id)
@@ -268,6 +268,7 @@ def attendance(request):
                 form.save()
                 messages.success(request, 'DTR entry successfully edited!')
                 return redirect('attendance')
+
         elif 'delete_dtr' in request.POST:
             dtr_id = request.POST.get('dtr_id')
             dtr_instance = get_object_or_404(DTR, pk=dtr_id)
@@ -276,32 +277,26 @@ def attendance(request):
             return redirect('attendance')
 
     else:
+        # Rendering the attendance page
         form = UploadFileForm()
-        dtrs = DTR.objects.all().order_by('-datetime')
-        for dtr in dtrs:
-            emp = Employee.objects.get(employee_id=dtr.number) #instead of using PK, use the employee_id
-            dtr.employee = emp
-            dtr.employee.full_name = f"{emp.first_name} {emp.last_name}".title()
-            dtr.employee.department.department_name= emp.department.department_name.title()
-            dtr.employee.position.position = emp.position.position.title()
-            dtr.datetime = dtr.datetime.strftime('%B %d, %Y %I:%M %p')
+        dtrs = []
+        all_dtrs = DTR.objects.all().order_by('-datetime')
+        for dtr in all_dtrs:
+            try:
+                employee = Employee.objects.get(employee_id=dtr.number)
+                dtr.employee = employee
+                dtr.employee.full_name = f"{employee.first_name} {employee.last_name}".title()
+                dtr.employee.department.department_name = employee.department.department_name.title()
+                dtr.employee.position.position = employee.position.position.title()
+                dtr.datetime = dtr.datetime.strftime('%B %d, %Y %I:%M %p')
+                dtrs.append(dtr)
+            except Employee.DoesNotExist:
+                continue
+
         employees = Employee.objects.filter(status=1).exclude(department__department_name__iexact='hr')
         for employee in employees:
             employee.full_name = f"{employee.first_name} {employee.last_name}".title()
 
-        # Paginate the queryset
-        paginator = Paginator(dtrs, 10)  # Change 10 to the number of items per page you want
-        page = request.GET.get('page')
-        try:
-            dtrs = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            dtrs = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range, deliver last page of results.
-            dtrs = paginator.page(paginator.num_pages)
-
-        # Pass the paginated queryset to the template
         return render(request, 'attendance.html', {'form': form, 'dtrs': dtrs, 'employees': employees})
 
 def payroll(request):
