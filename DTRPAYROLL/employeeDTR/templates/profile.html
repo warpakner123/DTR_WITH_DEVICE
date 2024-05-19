@@ -247,21 +247,17 @@
             <form method="post" id="employee_form">
               {% csrf_token %}
               <div class="modal-body">
-                <div class="col-2">
-                    <label for="employee_id" class="col-form-label"
-                      >Employee ID:
-                      </label>
+                <div class="form-group">
+                  <label for="employee_id" class="col-form-label">Employee ID:</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="employee_id"
+                    name="employee_id"
+                    min="1"
+                    required
+                  />
                 </div>
-                <div class="col-1">
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="employee_id"
-                      name="employee_id"
-                      required
-                      min="1"
-                    />
-                  </div>
                 <div class="form-group row">
                   <div class="col-6">
                     <label for="first_name" class="col-form-label"
@@ -407,25 +403,36 @@
                     />
                   </div>
                 </div>
-                <div class="form-group row">
+                {% comment %} <div class="form-group row pt-4">
                   <div class="col-6">
                     <button
                       type="button"
                       name="add_deductions"
                       class="btn bg-gradient-primary"
                       id="addDeductionsBtn"
+                      onclick="addSelectionInput()"
                     >
                       Add Deductions
                     </button>
                   </div>
                 </div>
-
-                <!-- Container to hold dynamically added form groups -->
-                <div id="deductionsContainer"></div>
-              </div>
+                <div id="selectionInputsContainer"></div>  {% endcomment %}
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="first_name" class="col-form-label"
+                      >Deductions: <p class="text-xs text-danger">* Check all applicable</p></label
+                    >
+                  </div></div>
+                {% for loan_tax in loans_taxes %}
+                  <div class="form-check mx-4">
+                    <input class="form-check-input" type="checkbox" id="loan_tax_{{ loan_tax.id }}" name="loan_tax_{{ loan_tax.id }}" value="{{ loan_tax.id }}">
+                    <label class="form-check-label" for="loan_tax_{{ loan_tax.id }}">{{ loan_tax.name }}</label>
+                  </div>
+                {% endfor %}
+            </div>
               <div class="modal-footer">
                 <button
-                  type="button"
+                  type="button" 
                   class="btn bg-gradient-secondary"
                   data-bs-dismiss="modal"
                 >
@@ -441,6 +448,33 @@
               </div>
             </form>
           </div>
+          {% if messages %} {% for message in messages %}
+            <div
+              class="my-4 text-sm alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} text-white"
+              role="alert"
+            >
+              <span class="alert-text">{{ message }}</span>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% endfor %} {% endif %}
+          </div>
+          <script>
+            setTimeout(function () {
+              document
+                .querySelector(".alert-dismissible")
+                .classList.remove("show");
+              document
+                .querySelector(".alert-dismissible")
+                .classList.add("fade");
+            }, 5000);
+          </script>
         </div>
       </div>
       {% comment %} End of Manual Modal {% endcomment %}
@@ -575,10 +609,84 @@
 
 
     <script>
-      let deductionCount = 0;
-      const maxDeductions = 3; // Change this according to your requirement
 
-      document.getElementById('addDeductionsBtn').addEventListener('click', function() {
+      /**
+      var counter = 0;
+
+    function addSelectionInput() {
+        counter++;
+
+        var container = document.getElementById('selectionInputsContainer');
+        var newDiv = document.createElement('div');
+        newDiv.className = 'form-group row';
+        var deductionId = 'deduction_' + counter;
+        newDiv.innerHTML = `
+            <label for="loan_tax_${counter}" class="col-form-label">Department:</label>
+            <div class="row">
+              <div class="col-10">
+                <select name="loan_tax_${counter}" id="loan_tax_${counter}" class="form-control mb-1" required>
+                    <option value="" selected disabled hidden>No Loan/Tax Selected</option>
+                    {% for loan_tax in loans_taxes %}
+                    <option value="{{ loan_tax.id }}">{{ loan_tax.name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="deductions" id="${deductionId}" value="">
+              </div>
+              <div class="col-2 d-flex">
+                <button
+                  type="button"
+                  name="remove_deductions"
+                  class="btn bg-gradient-danger btn-block flex-grow-1"
+                  id="addDeductionsBtn"
+                  onclick="removeSelectionInput(this)"
+                  data-deduction-id="${deductionId}"
+                >
+                  Remove
+                </button>
+              </div> 
+          </div>
+        `;
+
+        container.appendChild(newDiv);
+        checkSelections();
+    }
+
+    function checkSelections() {
+        var selections = document.querySelectorAll('select[id^="loan_tax_"]');
+        var selectedValues = [];
+        selections.forEach(function(selection) {
+            if (selection.value !== "") {
+                selectedValues.push(selection.value);
+            }
+        });
+
+        selections.forEach(function(selection) {
+            var options = selection.querySelectorAll('option');
+            options.forEach(function(option, index) {
+            if (index !== 0) {
+              if (selectedValues.includes(option.value)) {
+                option.hidden = true;
+              } else {
+                option.hidden = false;
+              }
+            }
+          });
+
+        });
+
+        var addButton = document.getElementById('addDeductionsBtn');
+        addButton.disabled = selectedValues.length === selections.length;
+    }
+
+    function removeSelectionInput(button) {
+        var deductionId = button.dataset.deductionId;
+        var divToRemove = button.closest('.form-group');
+        divToRemove.remove();
+        document.getElementById(deductionId).remove();
+        checkSelections();
+    }
+**/
+      /**document.getElementById('addDeductionsBtn').addEventListener('click', function() {
         if (deductionCount < maxDeductions) {
           // Create a new div for the form group
           var newFormGroup = document.createElement('div');
@@ -646,6 +754,7 @@
           alert('You can only add up to 3 deductions.');
         }
       });
+      **/
 
       // Event delegation to handle removing form groups
       document.getElementById('deductionsContainer').addEventListener('click', function(event) {
