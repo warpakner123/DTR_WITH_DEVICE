@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseBadRequest
-from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential
+from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential, Deductions
 from .forms import AddEmployeeForm, EmployeeForm, UploadFileForm, DTRForm
 from django.contrib import messages
 from computest import calculate_payroll, format_dates
@@ -275,6 +275,17 @@ def attendance(request):
             dtr_instance.delete()
             messages.success(request, 'DTR entry successfully deleted!')
             return redirect('attendance')
+        elif 'confirmBulkDelete' in request.POST:
+            ids_to_delete = request.POST.get('ids').split(',')
+            print(ids_to_delete)
+            DTR.objects.filter(id__in=ids_to_delete).delete()
+            messages.success(request, 'Selected DTR records have been deleted successfully.')
+            return redirect('attendance') 
+            # dtr_id = request.POST.get('dtr_id')
+            # dtr_instance = get_object_or_404(DTR, pk=dtr_id)
+            # dtr_instance.delete()
+            # messages.success(request, 'DTR entry successfully deleted!')
+            return redirect('attendance')
 
     else:
         # Rendering the attendance page
@@ -402,12 +413,27 @@ def profile(request):
             return redirect('profile')
         elif 'add_employee' in request.POST:
             employee_id = request.POST.get('employee_id')
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+
             # Check if an employee with the same employee_id already exists
             if Employee.objects.filter(employee_id=employee_id).exists():
                 return HttpResponseBadRequest("Employee with this ID already exists!")
+            
+            # Check if an employee with the same first name and last name already exists
+            if Employee.objects.filter(first_name=first_name, last_name=last_name).exists():
+                return HttpResponseBadRequest("Employee with this name already exists!")
+            
             form = AddEmployeeForm(request.POST)  # Instantiate the AddEmployeeForm with POST data
             if form.is_valid():  # Validate the form
-                form.save()  # Save the form data to the database
+                employee = form.save()   # Save the form data to the database
+                # deductions_data = request.POST.getlist('deductions')  # Get the list of deductions from the form
+                deduction_ids = [value for key, value in request.POST.items() if key.startswith('loan_tax_')]
+
+                print(deduction_ids)
+                for deduction_id in deduction_ids:
+                    deduction = LoansTaxes.objects.get(id=deduction_id)  # Retrieve the deduction object from the database
+                    Deductions.objects.create(employee=employee, loanTaxes=deduction)  # Create Deductions object
                 messages.success(request, 'Employee successfully added!')  # Success message
                 return redirect('profile')  # Redirect to the profile page
             else:
@@ -417,6 +443,7 @@ def profile(request):
         departments = Department.objects.exclude(department_name__iexact='hr')
         positions = Position.objects.exclude(position__iexact='hr')
         loans_taxes = LoansTaxes.objects.all()
+        
 
         for employee in employees:
             employee.full_name = f"{employee.first_name} {employee.last_name}".title()
