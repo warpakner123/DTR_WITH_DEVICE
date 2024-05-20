@@ -16,7 +16,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.forms import AuthenticationForm
-from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 import json
 import ast
@@ -25,6 +24,10 @@ from django.db.models import Count
 from django.db.models import ProtectedError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 # from django.shortcuts import render
 # from django.http import HttpResponse
@@ -78,38 +81,33 @@ def generate_pdf_dtr_view(request):
             # Get the payroll data from the POST request
             dtr_data = request.POST.get('dtr_data', '')
             period = request.POST.get('period', '')
-            employee = request.POST.get('employee', '')
+            position = request.POST.get('position', '')
+            department = request.POST.get('department', '')
             employee_name = request.POST.get('employee_name', '')
 
             # Ensure that we have data to put into our context
-            if not all([dtr_data, period, employee, employee_name]):
+            if not all([dtr_data, period, position,department, employee_name]):
                 raise ValueError("No DTR data provided.")
 
-           # If we have a string, try to safely convert it to a Python object
-            # if isinstance(payroll_data_literal, str):
-            #     try:
-            #         PaySlip_Data = ast.literal_eval(payroll_data_literal)
-            #     except (ValueError, SyntaxError) as e:
-            #         logging.error(f"Error converting string to Python object: {e}")
-            #         return HttpResponse("Error parsing PaySlip data.")
-            # else:
-            #     # If it's not a string, then use it as is (should be a dictionary)
-            #     PaySlip_Data = payroll_data_literal
+            context = {
+                'dtr_data': dtr_data,
+                "period":period, 
+                "position":position.title(), 
+                "department":department.title(), 
+                "employee_name":employee_name.title(),
+            }
 
-            # Render the HTML template with the PaySlip data
-            # template = get_template('DTR_Template.html')
-            # html_content  = template.render({'dtr_data': dtr_data,"period":period, "employee":employee, "employee_name":employee_name})
-            # pdf_file = HTML(string=html_content).write_pdf()
+            html_string = render_to_string('DTR_Template.html', context)
+            # Generate PDF
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'inline; filename="payroll_results.pdf"'
+            result = pisa.CreatePDF(html_string, dest=response)
 
-            # # Generate PDF
-            # response = HttpResponse(pdf_file, content_type='application/pdf')
-            # response['Content-Disposition'] = 'inline; filename="document.pdf"'
+            if result.err:
+                logging.error(f"Error in PDF generation: {result.err}")
+                return HttpResponse("Error generating PDF.")
 
-            # if result.err:
-            #     logging.error(f"Error in PDF generation: {result.err}")
-            #     return HttpResponse("Error generating PDF.")
-
-            # return response
+            return response
         else:
             return HttpResponse("Invalid request method.")
     except Exception as e:
@@ -280,11 +278,6 @@ def attendance(request):
             print(ids_to_delete)
             DTR.objects.filter(id__in=ids_to_delete).delete()
             messages.success(request, 'Selected DTR records have been deleted successfully.')
-            return redirect('attendance') 
-            # dtr_id = request.POST.get('dtr_id')
-            # dtr_instance = get_object_or_404(DTR, pk=dtr_id)
-            # dtr_instance.delete()
-            # messages.success(request, 'DTR entry successfully deleted!')
             return redirect('attendance')
 
     else:
@@ -360,7 +353,8 @@ def payroll(request):
                 return render(request, 'generate_dtr.html', {
                     'dtr_data': dtr_records,
                     'employee_name': f"{employee.first_name} {employee.last_name}",
-                    "employee" : employee,
+                    "position" : employee.position.position, 
+                    "department" : employee.department.department_name,
                     "period" : period
                 })
 
@@ -386,7 +380,7 @@ def logout_user(request):
     logout(request)
     return redirect('custom_login')
 
-def profile(request):
+def profile(request): 
     if request.method == 'POST':
         if 'edit_employee' in request.POST:
             form = EmployeeForm(request.POST)

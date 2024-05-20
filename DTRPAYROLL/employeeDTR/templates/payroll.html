@@ -151,13 +151,13 @@
                             <div class="mb-4">
                                 <h6>Select Action:</h6>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="generatePayslip" value="payslip" checked>
+                                    <input class="form-check-input" type="radio" name="action" id="generatePayslip" value="payslip" checked onclick="showDeductions()">
                                     <label class="form-check-label" for="generatePayslip">
                                         Generate Payslip
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="generateDTR" value="dtr">
+                                    <input class="form-check-input" type="radio" name="action" id="generateDTR" value="dtr" onclick="hideDeductions()">
                                     <label class="form-check-label" for="generateDTR">
                                         Generate DTR
                                     </label>
@@ -178,21 +178,21 @@
                                 <label for="end_date">End Date:</label>
                                 <input type="date" id="end_date" name="end_date" class="form-control mb-5" required>
 
-                                <div class="mb-4">
-                                <h6>Include Deduction?</h6>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="deductions" id="yes" value="yes" checked>
-                                    <label class="form-check-label" for="yes">
-                                        Yes
-                                    </label>
+                                <div class="mb-4" id="deductionsSection">
+                                    <h6>Include Deduction?</h6>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="deductions" id="yes" value="yes" checked>
+                                        <label class="form-check-label" for="yes">
+                                            Yes
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="deductions" id="no" value="no">
+                                        <label class="form-check-label" for="no">
+                                            No
+                                        </label>
+                                    </div>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="deductions" id="no" value="no">
-                                    <label class="form-check-label" for="no">
-                                        No
-                                    </label>
-                                </div>
-                            </div>
 
                             </div>
 
@@ -235,6 +235,14 @@
                 damping: '0.5'
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+
+        function hideDeductions() {
+            document.getElementById("deductionsSection").style.display = "none";
+        }
+
+        function showDeductions() {
+            document.getElementById("deductionsSection").style.display = "block";
         }
     </script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>

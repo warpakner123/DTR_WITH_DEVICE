@@ -7,183 +7,202 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="{% static 'img/apple-icon.png' %}"
-    />
-    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
-    <title>Payroll | Payslip</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
-      rel="stylesheet"
-    />
-    <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
-    <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
-    <script
-      src="https://kit.fontawesome.com/42d5adcbca.js"
-      crossorigin="anonymous"
-    ></script>
-    <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
-    <link
-      id="pagestyle"
-      href="{% static 'css/argon-dashboard.css' %}"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.datatables.net/2.0.7/css/dataTables.bootstrap5.css"
-      rel="stylesheet"
-    />
     <style>
-      table.dataTable thead th {
-        border: 2px solid #f0f2f4; /* Change the border color and width */
+
+      .custom-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
       }
+
+      .custom-container .col-md-6 {
+        text-align: center;
+      }
+
+      .custom-table {
+        width: 100%; /* Set table width to 100% */
+        margin: auto; /* Center the table horizontally */
+        border-collapse: collapse;
+      }
+
+      .custom-table td {
+        border: 1px solid #a9a9a9; /* Add borders to cells */
+        padding: 6px; /* Add padding to cells */
+        text-align: left; /* Center align text */
+        vertical-align: middle;
+        width: 25%; /* Set width of each cell to 25% */
+      }
+
+      .custom-header {
+        background-color: #f2f2f2;
+      }
+
+      .custom-data {
+        background-color: #fff;
+        text-transform: uppercase ;
+      }
+
+      .custom-data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .custom-data-table th,
+      .custom-data-table td {
+        border: 1px solid #a9a9a9;
+        padding: 6px;
+        text-align: center;
+        vertical-align: middle;
+        width: 20%;
+      }
+
+      .custom-data-table th {
+        font-weight: bold;
+      }
+
+      .custom-data-table tbody tr:nth-child(even) td {
+        background-color: #f2f2f2; 
+      }
+
+
+
     </style>
   </head>
   <body>
-    <h1>PaySlip Results</h1>
-
-    <main class="main-content position-relative max-height-vh-100 h-100">
-      <div class="card shadow-lg mx-4 card-profile-bottom">
-        <div class="card-body p-5">
-          <div class="row gx-4 align-items-start">
-            <div class="col">
-              <h5 class="mb-6">Generate DTR</h5>
-              <table class="table table-bordered align-items-left mb-6 mt-4">
-                <thead class="align-items-left">
-                  <tr>
-                    <th
-                      class="text-secondary text-sm font-weight-bolder opacity-7"
-                    >
-                      Employee
-                    </th>
-                    <th class="text-uppercase text-sm">{{employee_name}}</th>
-                    <th
-                      class="text-secondary text-sm font-weight-bolder opacity-7"
-                    >
-                      Position
-                    </th>
-                    <th class="text-uppercase text-sm">
-                      {{employee.position.position}}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th
-                      class="px-4 py-3 text-secondary text-sm font-weight-bolder opacity-7"
-                    >
-                      Office/Department
-                    </th>
-                    <th class="px-4 py-3 text-uppercase text-sm">
-                      {{employee.department.department_name}}
-                    </th>
-                    <th
-                      class="px-4 py-3 text-secondary text-sm font-weight-bolder opacity-7"
-                    >
-                      Period
-                    </th>
-                    <th class="px-4 py-3 text-uppercase text-sm">{{period}}</th>
-                  </tr>
-                </tbody>
-              </table>
-              {% comment %}
-              <div class="table-responsive p-0">
-                <table
-                  id="dtrTable"
-                  style="width: 100%"
-                  class="table table-striped table-bordered table-hover align-items-left mb-0 mt-4"
-                >
-                  <thead class="align-items-left">
-                    <tr>
-                      <th
-                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      >
-                        Day
-                      </th>
-                      <th
-                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      >
-                        Date
-                      </th>
-                      <th
-                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      >
-                        Time
-                      </th>
-                      <th
-                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      >
-                        Mode
-                      </th>
-                      <th
-                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      >
-                        Remarks
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for data in dtr_data %}
-                    <tr>
-                      <td class="align-middle text-sm mb-0">{{data.day}}</td>
-                      <td class="align-middle text-sm mb-0">{{data.date}}</td>
-                      <td class="align-middle text-sm mb-0">{{data.time}}</td>
-                      <td class="align-middle text-sm mb-0">
-                        {% if data.status == "C/In" %} In {% else %} Out {%
-                        endif %}
-                      </td>
-                      <td class="align-middle text-sm">
-                        {% if data.status == "C/In" %}
-                        <span class="badge badge-sm bg-gradient-success">
-                          CHECK-IN
-                        </span>
-                        {% else %}
-                        <span class="badge badge-sm bg-gradient-danger">
-                          CHECK-OUT
-                        </span>
-                        {% endif %}
-                      </td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-              {% endcomment %}
-            </div>
-          </div>
+    <div class="container custom-container">
+      <div class="row">
+        <div class="col-md-6 mx-auto">
+          <h1>
+            Electronic Daily Attendance Record and Manual Daily Attendance Record
+          </h1>
         </div>
       </div>
+    </div>
+    <main >
+      <table class="custom-table">
+        <tbody>
+          <tr>
+            <td class="custom-header">Employee</td>
+            <td class="custom-data">{{employee_name}}</td>
+            <td class="custom-header">Position</td>
+            <td class="custom-data">{{position}}</td>
+          </tr>
+          <tr>
+            <td class="custom-header">Office/Department</td>
+            <td class="custom-data">{{department}}</td>
+            <td class="custom-header">Period</td>
+            <td class="custom-data">{{period}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:20px">
+      <table class="custom-data-table">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Mode</th>            
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in dtr_data %}
+          <tr>
+            <td>{{data.day}}</td>
+            <td>{{data.date}}</td>
+            <td>{{data.time}}</td>
+            <td>
+              {% if data.status == "C/In" %}
+                In
+              {% else %}
+                Out
+              {% endif %}
+            </td>
+            <td class="align-middle text-sm">
+              {% if data.status == "C/In" %}
+                CHECK-IN
+              {% else %}
+                CHECK-OUT
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+        {% comment %} <div class="table-responsive p-0">
+          <table
+            class="table table-striped table-bordered table-hover align-items-left mb-0 mt-4"
+          >
+            <thead class="align-items-left">
+              <tr>
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
+                  Day
+                </th>
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
+                  Date
+                </th>
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
+                  Time
+                </th>
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
+                  Mode
+                </th>
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
+                  Remarks
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for data in dtr_data %}
+                <tr>
+                  <td class="align-middle text-sm mb-0">
+                    {{data.day}}
+                  </td>
+                  <td class="align-middle text-sm mb-0">
+                    {{data.date}}
+                  </td>
+                  <td class="align-middle text-sm mb-0">
+                    {{data.time}}
+                  </td>
+                  <td class="align-middle text-sm mb-0">
+                    {% if data.status == "C/In" %}
+                      In
+                    {% else %}
+                      Out
+                    {% endif %}
+                  </td>
+                  <td class="align-middle text-sm">
+                    {% if data.status == "C/In" %}
+                      <span class="badge badge-sm bg-gradient-success">
+                        CHECK-IN
+                      </span>
+                    {% else %}
+                      <span class="badge badge-sm bg-gradient-danger">
+                        CHECK-OUT
+                      </span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div> {% endcomment %}
+      {% comment %} </div> {% endcomment %}
     </main>
-    <!--   Core JS Files   -->
-    <script src="{% static 'js/core/popper.min.js' %}"></script>
-    <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/plugins/perfect-scrollbar.min.js' %}"></script>
-    <script src="{% static 'js/plugins/smooth-scrollbar.min.js' %}"></script>
-    <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
-    <script>
-      var win = navigator.platform.indexOf("Win") > -1;
-      if (win && document.querySelector("#sidenav-scrollbar")) {
-        var options = {
-          damping: "0.5",
-        };
-        Scrollbar.init(document.querySelector("#sidenav-scrollbar"), options);
-      }
-    </script>
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <script src="{% static 'js/argon-dashboard.min.js' %}"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.js"></script>
-    <script>
-      new DataTable("#dtrTable");
-    </script>
   </body>
 </html>
