@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential, Deductions
 from .forms import AddEmployeeForm, EmployeeForm, UploadFileForm, DTRForm
 from django.contrib import messages
-from computest import calculate_payroll, format_dates
+from computest import calculate_payroll, format_dates, format_dtr
 import pandas as pd
 from django.utils import timezone
 import logging
@@ -79,18 +79,27 @@ def generate_pdf_dtr_view(request):
     try:
         if request.method == 'POST':
             # Get the payroll data from the POST request
-            dtr_data = request.POST.get('dtr_data', '')
+            dtr_data_literal = request.POST.get('dtr_data', '')
             period = request.POST.get('period', '')
             position = request.POST.get('position', '')
             department = request.POST.get('department', '')
             employee_name = request.POST.get('employee_name', '')
 
             # Ensure that we have data to put into our context
-            if not all([dtr_data, period, position,department, employee_name]):
+            if not all([dtr_data_literal, period, position,department, employee_name]):
                 raise ValueError("No DTR data provided.")
 
+            if isinstance(dtr_data_literal, str):
+                try:
+                    DTR_Data = ast.literal_eval(dtr_data_literal)
+                except (ValueError, SyntaxError) as e:
+                    logging.error(f"Error converting string to Python object: {e}")
+                    return HttpResponse("Error parsing DTR data.")
+            else:
+                DTR_Data = dtr_data_literal
+
             context = {
-                'dtr_data': dtr_data,
+                'dtr_data': DTR_Data,
                 "period":period, 
                 "position":position.title(), 
                 "department":department.title(), 
@@ -98,6 +107,7 @@ def generate_pdf_dtr_view(request):
             }
 
             html_string = render_to_string('DTR_Template.html', context)
+
             # Generate PDF
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = 'inline; filename="payroll_results.pdf"'
@@ -311,7 +321,6 @@ def payroll(request):
         end_date = request.POST.get('end_date')
         deduct = request.POST.get('deductions')
 
-        print(start_date,end_date)
         if not all([employee_id, start_date, end_date]):
             messages.error(request, 'All fields are required.')
             return redirect('payroll')
@@ -345,13 +354,11 @@ def payroll(request):
                 })
             elif action == 'dtr':
                 period = format_dates(start_date,end_date)
-                for dtr in dtr_records:
-                    dtr.day = dtr.datetime.strftime('%a')
-                    dtr.date = dtr.datetime.strftime('%d/%m/%Y')
-                    dtr.time = dtr.datetime.strftime('%I:%M %p')
-
+                dtr_data_json = format_dtr(dtr_records)
+                dtr_data = json.loads(dtr_data_json)
+               
                 return render(request, 'generate_dtr.html', {
-                    'dtr_data': dtr_records,
+                    'dtr_data': dtr_data,
                     'employee_name': f"{employee.first_name} {employee.last_name}",
                     "position" : employee.position.position, 
                     "department" : employee.department.department_name,

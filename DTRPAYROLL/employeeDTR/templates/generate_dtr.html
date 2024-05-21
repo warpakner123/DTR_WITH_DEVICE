@@ -267,20 +267,16 @@
                                             {{data.time}}
                                         </td>
                                         <td class="align-middle text-sm mb-0 ">
-                                            {% if data.status == "C/In" %}
-                                                In
-                                            {% else %}
-                                                Out
-                                            {% endif %}
+                                            {{data.mode}}
                                         </td>
                                         <td class="align-middle text-sm">
-                                            {% if data.status == "C/In" %}
+                                            {% if data.remarks == "CHECK-IN" %}
                                             <span class="badge badge-sm bg-gradient-success">
-                                                CHECK-IN
+                                                {{data.remarks}}
                                             </span>
                                             {% else %}
                                             <span class="badge badge-sm bg-gradient-danger">
-                                                CHECK-OUT
+                                                {{data.remarks}}
                                             </span>
                                             {% endif %}
                                         </td>

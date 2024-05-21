@@ -65,8 +65,6 @@
         background-color: #f2f2f2; 
       }
 
-
-
     </style>
   </head>
   <body>
@@ -114,20 +112,9 @@
             <td>{{data.day}}</td>
             <td>{{data.date}}</td>
             <td>{{data.time}}</td>
-            <td>
-              {% if data.status == "C/In" %}
-                In
-              {% else %}
-                Out
-              {% endif %}
-            </td>
+            <td>{{data.mode}}</td>
             <td class="align-middle text-sm">
-              {% if data.status == "C/In" %}
-                CHECK-IN
-              {% else %}
-                CHECK-OUT
-              {% endif %}
-            </td>
+              {{data.remarks}}</td>
           </tr>
           {% endfor %}
         </tbody>

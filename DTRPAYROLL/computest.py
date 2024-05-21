@@ -6,6 +6,8 @@ from collections import defaultdict
 import calendar
 import json
 from datetime import datetime
+from django.http import JsonResponse
+
 
 # Setup Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
@@ -135,6 +137,29 @@ def calculate_payroll(dtr_records, start_date, end_date, deduct):
 
         payroll_data_json = json.dumps(payroll_data, ensure_ascii=False)
         return payroll_data_json
+
+def format_dtr(dtr_records):
+    dtr_data = []
+
+    for data in dtr_records:
+        day = data.datetime.strftime('%a'),
+        date = data.datetime.strftime('%d/%m/%Y'),
+        time = data.datetime.strftime('%I:%M %p'),
+        mode = "In" if data.status == "C/In" else "Out",
+        remarks = "CHECK-IN" if data.status == "C/In" else "CHECK-OUT",
+
+        newData = {
+        "day": day[0],  # Extracting the string directly
+        "date": date[0],  # Extracting the string directly
+        "time": time[0],  # Extracting the string directly
+        "mode": mode[0],  # Extracting the string directly
+        "remarks": remarks[0]  # Extracting the string directly
+    }
+
+        dtr_data.append(newData)
+    dtr_data_json = json.dumps(dtr_data, ensure_ascii=False)
+    print(dtr_data_json)
+    return dtr_data_json
 
 def format_dates(date1, date2):
     # Ensure input dates are datetime objects
