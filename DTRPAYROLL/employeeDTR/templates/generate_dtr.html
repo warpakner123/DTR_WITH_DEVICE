@@ -134,7 +134,7 @@
             </ul>
         </div>
     </aside>
-    <main class="main-content position-relative max-height-vh-100 h-100">
+    <main class="main-content position-relative max-height-vh-100 h-100">   
         <!-- Navbar -->
         <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none position-absolute w-100 " id="navbarBlur"
             data-scroll="false">
@@ -197,7 +197,7 @@
                                     </th><th
                                     class="text-uppercase text-sm"
                                     >
-                                    {{employee.position.position}}
+                                    {{position}}
                                     </th>
                                 </tr>
                             </thead>
@@ -211,7 +211,7 @@
                                     <th
                                     class="px-4 py-3 text-uppercase text-sm"
                                     >
-                                    {{employee.department.department_name}}
+                                    {{department}}
                                     </th>
                                     <th
                                     class="px-4 py-3 text-secondary text-sm font-weight-bolder opacity-7"
@@ -267,20 +267,16 @@
                                             {{data.time}}
                                         </td>
                                         <td class="align-middle text-sm mb-0 ">
-                                            {% if data.status == "C/In" %}
-                                                In
-                                            {% else %}
-                                                Out
-                                            {% endif %}
+                                            {{data.mode}}
                                         </td>
                                         <td class="align-middle text-sm">
-                                            {% if data.status == "C/In" %}
+                                            {% if data.remarks == "CHECK-IN" %}
                                             <span class="badge badge-sm bg-gradient-success">
-                                                CHECK-IN
+                                                {{data.remarks}}
                                             </span>
                                             {% else %}
                                             <span class="badge badge-sm bg-gradient-danger">
-                                                CHECK-OUT
+                                                {{data.remarks}}
                                             </span>
                                             {% endif %}
                                         </td>
@@ -291,20 +287,22 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Button to generate PDF payroll -->
                 <form method="POST" action="{% url 'generate-pdf-dtr' %}" class="mt-6">
                     {% csrf_token %}
                     <input type="hidden" name="dtr_data" value="{{ dtr_data|safe }}">                    
                     <input type="hidden" name="period" value="{{ period|safe }}">
-                    <input type="hidden" name="employee" value="{{ employee|safe }}">
+                    <input type="hidden" name="position" value="{{ position|safe }}">                    
+                    <input type="hidden" name="department" value="{{ department|safe }}">
                     <input type="hidden" name="employee_name" value="{{ employee_name|safe }}">
-                    <button type="submit" class="btn btn-primary btn-md text-md ">
+                    <button type=submit class="btn btn-primary btn-md text-md ">
                         <i
                             class="ni ni-cloud-download-95 m-2"
                             style="font-size: 20px; vertical-align: middle"
                         ></i> Download PDF
                     </button>
-                </form>
+                </form> 
             </div>
         </div>
         </div>
@@ -326,7 +324,6 @@
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
         }
-
     </script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="{% static 'js/argon-dashboard.min.js' %}"></script>
@@ -339,6 +336,7 @@
     <script>
         new DataTable('#dtrTable');
     </script>
+    
 </body>
 
 </html>
