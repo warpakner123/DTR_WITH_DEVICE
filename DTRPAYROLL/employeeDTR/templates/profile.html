@@ -219,7 +219,251 @@
         </button>
       </div>
 
-
+      {% comment %} Manual Modal {% endcomment %}
+      <div
+        class="modal fade"
+        id="addModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="addModalTitle"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-lg"  role="document" style="right:0;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addModalLabel">
+                Add Employee Profile
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onclick="resetForm({{ employee.id }})"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <form method="post" id="employee_form">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="employee_id" class="col-form-label">Employee ID:</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="employee_id"
+                    name="employee_id"
+                    min="1"
+                    required
+                  />
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="first_name" class="col-form-label"
+                      >First Name:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="first_name"
+                      name="first_name"
+                      required
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="last_name" class="col-form-label"
+                      >Last Name:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="last_name"
+                      name="last_name"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="email" class="col-form-label">Email:</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="email"
+                      name="email"
+                      required
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="dob" class="col-form-label">Date of Birth:</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="dob"
+                      name="dob"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="address" class="col-form-label">Address:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="address"
+                    name="address"
+                    required
+                  />
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="first_name" class="col-form-label"
+                      >Department:</label
+                    >
+                    <select name="department" id="department" class="form-control mb-3" required>
+                        <option value="" selected disabled hidden>No Department Selected</option>
+                        {% for department in departments %}
+                            <option value="{{ department.id }}">{{ department.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="position" class="col-form-label"
+                      >Position:</label
+                    >
+                    <select name="position" id="position" class="form-control mb-3" required>
+                        <option value="" selected disabled hidden>No Position Selected</option>
+                        {% for position in positions %}
+                            <option value="{{ position.id }}">{{ position.position }}</option>
+                        {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="hourly_rate" class="col-form-label"
+                      >Hourly Rate:</label
+                    >
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control"
+                      id="hourly_rate"
+                      name="hourly_rate"
+                      required
+                      min="0"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="Overtime_rate" class="col-form-label"
+                      >Overtime Rate:</label
+                    >
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control"
+                      id="Overtime_rate"
+                      name="Overtime_rate"
+                      required
+                      min="0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="employee_type" class="col-form-label"
+                      >Employee Type:</label
+                    >
+                    <select
+                      name="employee_type"
+                      id="employee_type"
+                      class="form-control mb-3"
+                      required
+                    >
+                      <option hidden value="" selected>
+                        No Employee Type Selected
+                      </option>
+                      <option value="Part-Time">Full-Time</option>
+                      <option value="Part-Time">Part-Time</option>
+                      <option value="Flex-Time">Flex-Time</option>
+                      <option value="Project-Based">Project-Based</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="date_hired" class="col-form-label"
+                    >Date Hired:</label
+                    >
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="date_hired"
+                      name="date_hired"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-6">
+                    <label for="first_name" class="col-form-label"
+                      >Deductions: <p class="text-xs text-danger">* Check all applicable</p></label
+                    >
+                  </div></div>
+                {% for loan_tax in loans_taxes %}
+                  <div class="form-check mx-4">
+                    <input class="form-check-input" type="checkbox" id="loan_tax_{{ loan_tax.id }}" name="loan_tax_{{ loan_tax.id }}" value="{{ loan_tax.id }}">
+                    <label class="form-check-label" for="loan_tax_{{ loan_tax.id }}">{{ loan_tax.name }}</label>
+                  </div>
+                {% endfor %}
+            </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn bg-gradient-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  name="add_employee"
+                  class="btn bg-gradient-success"
+                >
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
+          {% if messages %} {% for message in messages %}
+            <div
+              class="my-4 text-sm alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} text-white"
+              role="alert"
+            >
+              <span class="alert-text">{{ message }}</span>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% endfor %} {% endif %}
+          </div>
+          <script>
+            setTimeout(function () {
+              document
+                .querySelector(".alert-dismissible")
+                .classList.remove("show");
+              document
+                .querySelector(".alert-dismissible")
+                .classList.add("fade");
+            }, 5000);
+          </script>
+        </div>
+      </div>
+      {% comment %} End of Manual Modal {% endcomment %}
 
       <div class="card shadow-lg mx-4 card-profile-bottom">
         <div class="card-body">
@@ -351,153 +595,6 @@
 
 
     <script>
-
-      /**
-      var counter = 0;
-
-    function addSelectionInput() {
-        counter++;
-
-        var container = document.getElementById('selectionInputsContainer');
-        var newDiv = document.createElement('div');
-        newDiv.className = 'form-group row';
-        var deductionId = 'deduction_' + counter;
-        newDiv.innerHTML = `
-            <label for="loan_tax_${counter}" class="col-form-label">Department:</label>
-            <div class="row">
-              <div class="col-10">
-                <select name="loan_tax_${counter}" id="loan_tax_${counter}" class="form-control mb-1" required>
-                    <option value="" selected disabled hidden>No Loan/Tax Selected</option>
-                    {% for loan_tax in loans_taxes %}
-                    <option value="{{ loan_tax.id }}">{{ loan_tax.name }}</option>
-                    {% endfor %}
-                </select>
-                <input type="hidden" name="deductions" id="${deductionId}" value="">
-              </div>
-              <div class="col-2 d-flex">
-                <button
-                  type="button"
-                  name="remove_deductions"
-                  class="btn bg-gradient-danger btn-block flex-grow-1"
-                  id="addDeductionsBtn"
-                  onclick="removeSelectionInput(this)"
-                  data-deduction-id="${deductionId}"
-                >
-                  Remove
-                </button>
-              </div> 
-          </div>
-        `;
-
-        container.appendChild(newDiv);
-        checkSelections();
-    }
-
-    function checkSelections() {
-        var selections = document.querySelectorAll('select[id^="loan_tax_"]');
-        var selectedValues = [];
-        selections.forEach(function(selection) {
-            if (selection.value !== "") {
-                selectedValues.push(selection.value);
-            }
-        });
-
-        selections.forEach(function(selection) {
-            var options = selection.querySelectorAll('option');
-            options.forEach(function(option, index) {
-            if (index !== 0) {
-              if (selectedValues.includes(option.value)) {
-                option.hidden = true;
-              } else {
-                option.hidden = false;
-              }
-            }
-          });
-
-        });
-
-        var addButton = document.getElementById('addDeductionsBtn');
-        addButton.disabled = selectedValues.length === selections.length;
-    }
-
-    function removeSelectionInput(button) {
-        var deductionId = button.dataset.deductionId;
-        var divToRemove = button.closest('.form-group');
-        divToRemove.remove();
-        document.getElementById(deductionId).remove();
-        checkSelections();
-    }
-**/
-      /**document.getElementById('addDeductionsBtn').addEventListener('click', function() {
-        if (deductionCount < maxDeductions) {
-          // Create a new div for the form group
-          var newFormGroup = document.createElement('div');
-          newFormGroup.className = 'form-group row';
-
-          // Create the label and select container div
-          var selectContainer = document.createElement('div');
-          selectContainer.className = 'col-6';
-
-          // Create the label
-          var newLabel = document.createElement('label');
-          newLabel.setAttribute('for', 'deductions_' + deductionCount);
-          newLabel.innerText = 'Deductions:';
-
-          // Create the select element
-          var newSelect = document.createElement('select');
-          newSelect.id = 'deductions_' + deductionCount; // Unique ID for each select element
-          newSelect.name = 'deductions_' + deductionCount; // Unique name for each select element
-          newSelect.className = 'form-control mb-3';
-
-          // Add the default option
-          var defaultOption = document.createElement('option');
-          defaultOption.value = '';
-          defaultOption.selected = true;
-          defaultOption.disabled = true;
-          defaultOption.hidden = true;
-          defaultOption.innerText = 'No Deduction Selected';
-          newSelect.appendChild(defaultOption);
-
-          // Add options dynamically from the loans_taxes variable
-          {% for loan_tax in loans_taxes %}
-            var option = document.createElement('option');
-            option.value = "{{ loan_tax.id }}";
-            option.innerText = "{{ loan_tax.name }}";
-            newSelect.appendChild(option);
-          {% endfor %}
-
-          // Append label and select to the select container
-          selectContainer.appendChild(newLabel);
-          selectContainer.appendChild(newSelect);
-
-          // Create the remove button container div
-          var buttonContainer = document.createElement('div');
-          buttonContainer.className = 'col-6';
-
-          // Create the remove button
-          var removeButton = document.createElement('button');
-          removeButton.type = 'button';
-          removeButton.className = 'btn btn-danger remove-deduction';
-          removeButton.innerText = 'Remove';
-
-          // Append remove button to the button container
-          buttonContainer.appendChild(removeButton);
-
-          // Append the select container and button container to the new form group
-          newFormGroup.appendChild(selectContainer);
-          newFormGroup.appendChild(buttonContainer);
-
-          // Append the new form group to the container
-          document.getElementById('deductionsContainer').appendChild(newFormGroup);
-
-          // Increment the counter
-          deductionCount++;
-        } else {
-          alert('You can only add up to 3 deductions.');
-        }
-      });
-      **/
-
       // Event delegation to handle removing form groups
       document.getElementById('deductionsContainer').addEventListener('click', function(event) {
         if (event.target && event.target.classList.contains('remove-deduction')) {
@@ -528,541 +625,315 @@
 
   </body>
 
-  {% comment %} Manual Modal {% endcomment %}
-    <div
-      class="modal fade"
-      id="addModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="addModalTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg"  role="document" style="right:0;">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addModalLabel">
-              Add Employee Profile
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              onclick="resetForm({{ employee.id }})"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form method="post" id="employee_form">
-              {% csrf_token %}
-              <div class="form-group">
-                <label for="employee_id" class="col-form-label">Employee ID:</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  id="employee_id"
-                  name="employee_id"
-                  min="1"
-                  required
-                />
-              </div>
-              <div class="form-group row">
-                <div class="col-6">
-                  <label for="first_name" class="col-form-label"
-                    >First Name:</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="first_name"
-                    name="first_name"
-                    required
-                  />
-                </div>
-                <div class="col-6">
-                  <label for="last_name" class="col-form-label"
-                    >Last Name:</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="last_name"
-                    name="last_name"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-6">
-                  <label for="email" class="col-form-label">Email:</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    required
-                  />
-                </div>
-                <div class="col-6">
-                  <label for="dob" class="col-form-label">Date of Birth:</label>
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="dob"
-                    name="dob"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="address" class="col-form-label">Address:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="address"
-                  name="address"
-                  required
-                />
-              </div>
-              <div class="form-group row">
-                <div class="col-6">
-                  <label for="first_name" class="col-form-label"
-                    >Department:</label
-                  >
-                  <select name="department" id="department" class="form-control mb-3" required>
-                      <option value="" selected disabled hidden>No Department Selected</option>
-                      {% for department in departments %}
-                          <option value="{{ department.id }}">{{ department.department_name }}</option>
-                      {% endfor %}
-                  </select>
-                </div>
-                <div class="col-6">
-                  <label for="position" class="col-form-label"
-                    >Position:</label
-                  >
-                  <select name="position" id="position" class="form-control mb-3" required>
-                      <option value="" selected disabled hidden>No Position Selected</option>
-                      {% for position in positions %}
-                          <option value="{{ position.id }}">{{ position.position }}</option>
-                      {% endfor %}
-                  </select>
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-6">
-                  <label for="hourly_rate" class="col-form-label"
-                    >Hourly Rate:</label
-                  >
-                  <input
-                    type="number"
-                    step="0.01"
-                    class="form-control"
-                    id="hourly_rate"
-                    name="hourly_rate"
-                    required
-                    min="0"
-                  />
-                </div>
-                <div class="col-6">
-                  <label for="Overtime_rate" class="col-form-label"
-                    >Overtime Rate:</label
-                  >
-                  <input
-                    type="number"
-                    step="0.01"
-                    class="form-control"
-                    id="Overtime_rate"
-                    name="Overtime_rate"
-                    required
-                    min="0"
-                  />
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-6">
-                  <label for="employee_type" class="col-form-label"
-                    >Employee Type:</label
-                  >
-                  <select
-                    name="employee_type"
-                    id="employee_type"
-                    class="form-control mb-3"
-                    required
-                  >
-                    <option hidden value="" selected>
-                      No Employee Type Selected
-                    </option>
-                    <option value="Part-Time">Full-Time</option>
-                    <option value="Part-Time">Part-Time</option>
-                    <option value="Flex-Time">Flex-Time</option>
-                    <option value="Project-Based">Project-Based</option>
-                  </select>
-                </div>
-                <div class="col-6">
-                  <label for="date_hired" class="col-form-label"
-                  >Date Hired:</label
-                  >
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="date_hired"
-                    name="date_hired"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-6">
-                  <label for="first_name" class="col-form-label"
-                    >Deductions: <p class="text-xs text-danger">* Check all applicable</p></label
-                  >
-                </div></div>
-              {% for loan_tax in loans_taxes %}
-                <div class="form-check mx-4">
-                  <input class="form-check-input" type="checkbox" id="loan_tax_{{ loan_tax.id }}" name="loan_tax_{{ loan_tax.id }}" value="{{ loan_tax.id }}">
-                  <label class="form-check-label" for="loan_tax_{{ loan_tax.id }}">{{ loan_tax.name }}</label>
-                </div>
-              {% endfor %}
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button" 
-              class="btn bg-gradient-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-            <button
-              type="submit"
-              name="add_employee"
-              class="btn bg-gradient-success"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-        {% if messages %} {% for message in messages %}
-          <div
-            class="my-4 text-sm alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} text-white"
-            role="alert"
-          >
-            <span class="alert-text">{{ message }}</span>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          {% endfor %} {% endif %}
-        </div>
-        <script>
-          setTimeout(function () {
-            document
-              .querySelector(".alert-dismissible")
-              .classList.remove("show");
-            document
-              .querySelector(".alert-dismissible")
-              .classList.add("fade");
-          }, 5000);
-        </script>
-      </div>
-    </div>
-  {% comment %} End of Manual Modal {% endcomment %}
-
 <!-- Delete Modal -->
-  {% for employee in employees %}
-    <div
-        class="modal fade"
-        id="deleteModal{{ employee.id }}"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="deleteModalLabel{{ employee.id }}"
-        aria-hidden="true"
-    >
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel{{ employee.id }}">Remove Employee</h5>
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                    >
-                        <span aria-hidden="true">&times;</span>
+{% for employee in employees %}
+<div
+    class="modal fade"
+    id="deleteModal{{ employee.id }}"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="deleteModalLabel{{ employee.id }}"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ employee.id }}">Remove Employee</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Are you sure you want to remove {{ employee.full_name }}?</p>
+                </div>
+                    <input type="hidden" name="id" value="{{ employee.id }}">
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" name="delete_employee" class="btn bg-gradient-danger">
+                        Delete
                     </button>
                 </div>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                        <p>Are you sure you want to remove {{ employee.full_name }}?</p>
-                    </div>
-                        <input type="hidden" name="id" value="{{ employee.id }}">
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">
-                            Cancel
-                        </button>
-                        <button type="submit" name="delete_employee" class="btn bg-gradient-danger">
-                            Delete
-                        </button>
-                    </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
-  {% endfor %}
+</div>
+{% endfor %}
 
 <!-- Edit Modal -->
-  {% for employee in employees %}
-    <div
-      class="modal fade"
-      id="editModal{{ employee.id }}"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="editModalTitle{{ employee.id }}"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="right:0;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editModalTitle{{ employee.id }}">
-            Edit Employee Profile
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <!-- Form with Employee Data -->
-        <form method="post">
-          {% csrf_token %}
-          <div class="modal-body">
-            <input type="hidden" name="id" value="{{ employee.id }}">
-            <input type="hidden" name="employee_id" value="{{ employee.employee_id }}">
-              <div class="form-group row">
-                  <div class="col-2">
-                      <label for="employee_id" class="col-form-label">Employee ID:</label>
-                      <input
-                          type="number"
-                          class="form-control"
-                          id="employee_id{{ employee.id }}"
-                          name="employee_id"
-                          value="{{ employee.employee_id }}"
-                          required
-                          min="1"
-                      />
-                  </div>
-                  <div class="col-4">
-                      <label for="status" class="col-form-label">Active Status:</label>
-                      <select
-                          name="status"
-                          id="status{{ employee.id }}"
-                          class="form-control mb-3"
-                          required
-                      >
-                          <option hidden value="">Select Status</option>
-                          {% for value, label in employee.STATUS_CHOICES %}
-                              <option value="{{ value }}"
-                                  {% if value == employee.status %} selected {% endif %}>
-                                  {{ label }}
-                              </option>
-                          {% endfor %}
-                      </select>
-                  </div>
-              </div>
+{% for employee in employees %}
+<div
+  class="modal fade"
+  id="editModal{{ employee.id }}"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editModalTitle{{ employee.id }}"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="right:0;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalTitle{{ employee.id }}">
+          Edit Employee Profile
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <!-- Form with Employee Data -->
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="id" value="{{ employee.id }}">
+          <input type="hidden" name="employee_id" value="{{ employee.employee_id }}">
             <div class="form-group row">
-              <div class="col-6">
-                <label for="first_name" class="col-form-label">First Name:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="first_name{{ employee.id }}"
-                  name="first_name"
-                  value="{{ employee.first_name }}"
-                  required
-                />
-              </div>
-              <div class="col-6">
-                <label for="last_name" class="col-form-label">Last Name:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="last_name{{ employee.id }}"
-                  name="last_name"
-                  value="{{ employee.last_name }}"
-                  required
-                />
-              </div>
-            </div><div class="form-group row">
-            <div class="col-6">
-                <label for="email" class="col-form-label">Email:</label>
-                <input
-                    type="email"
-                    class="form-control"
-                    id="email{{ employee.id }}"
-                    name="email"
-                    value="{{ employee.email }}"
-                    required
-                />
+                <div class="col-2">
+                    <label for="employee_id" class="col-form-label">Employee ID:</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="employee_id{{ employee.id }}"
+                        name="employee_id"
+                        value="{{ employee.employee_id }}"
+                        required
+                        min="1"
+                    />
+                </div>
+                <div class="col-4">
+                    <label for="status" class="col-form-label">Active Status:</label>
+                    <select
+                        name="status"
+                        id="status{{ employee.id }}"
+                        class="form-control mb-3"
+                        required
+                    >
+                        <option hidden value="">Select Status</option>
+                        {% for value, label in employee.STATUS_CHOICES %}
+                            <option value="{{ value }}"
+                                {% if value == employee.status %} selected {% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
+          <div class="form-group row">
             <div class="col-6">
-                <label for="dob" class="col-form-label">Date of Birth:</label>
-                <input
-                    type="date"
-                    class="form-control"
-                    id="dob{{ employee.id }}"
-                    name="dob"
-                    value="{{ employee.dob|date:'Y-m-d' }}"
-                    required
-                />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="address" class="col-form-label">Address:</label>
-            <input
+              <label for="first_name" class="col-form-label">First Name:</label>
+              <input
                 type="text"
                 class="form-control"
-                id="address{{ employee.id }}"
-                name="address"
-                value="{{ employee.address }}"
+                id="first_name{{ employee.id }}"
+                name="first_name"
+                value="{{ employee.first_name }}"
                 required
-            />
-        </div>
-        <div class="form-group row">
-            <div class="col-6">
-                <label for="department" class="col-form-label">Department:</label>
-                <select
-                    name="department"
-                    id="department{{ employee.id }}"
-                    class="form-control mb-3"
-                    required
-                >
-                    <option hidden value="">No Department Selected</option>
-                    {% for department in departments %}
-                        <option value="{{ department.id }}"
-                            {% if department.id == employee.department.id %} selected {% endif %}>
-                            {{ department.department_name }}
-                        </option>
-                    {% endfor %}
-                </select>
+              />
             </div>
             <div class="col-6">
-                <label for="position" class="col-form-label">Position:</label>
-                <select
-                    name="position"
-                    id="position{{ employee.id }}"
-                    class="form-control mb-3"
-                    required
-                >
-                    <option hidden value="" selected>No Position Selected</option>
-                    {% for position in positions %}
-                    <option value="{{ position.id }}"
-                        {% if position.id == employee.position.id %} selected {% endif %}>
-                        {{ position.position }}
-                    </option>
-                    {% endfor %}
-                </select>
+              <label for="last_name" class="col-form-label">Last Name:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="last_name{{ employee.id }}"
+                name="last_name"
+                value="{{ employee.last_name }}"
+                required
+              />
             </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-6">
-                <label for="hourly_rate" class="col-form-label">Hourly Rate:</label>
-                <input
-                    type="number"
-                    step="0.01"
-                    class="form-control"
-                    id="hourly_rate{{ employee.id }}"
-                    name="hourly_rate"
-                    value="{{ employee.hourly_rate }}"
-                    required
-                    min="0"
-                />
-            </div>
-            <div class="col-6">
-                <label for="Overtime_rate" class="col-form-label">Overtime Rate:</label>
-                <input
-                    type="number"
-                    step="0.01"
-                    class="form-control"
-                    id="Overtime_rate{{ employee.id }}"
-                    name="Overtime_rate"
-                    value="{{ employee.Overtime_rate }}"
-                    required
-                    min="0"
-                />
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-6">
-                <label for="employee_type" class="col-form-label">Employee Type:</label>
-                <select
-                    name="employee_type"
-                    id="employee_type{{ employee.id }}"
-                    class="form-control mb-3"
-                    required
-                >
-                    <option hidden value="" {% if not employee.employee_type %} selected {% endif %}>No Employee Type Selected</option>
-                    <option value="Full-Time" {% if employee.employee_type == "Full-Time" %} selected {% endif %}>Full-Time</option>
-                    <option value="Part-Time" {% if employee.employee_type == "Part-Time" %} selected {% endif %}>Part-Time</option>
-                    <option value="Flex-Time" {% if employee.employee_type == "Flex-Time" %} selected {% endif %}>Flex-Time</option>
-                    <option value="Project-Based" {% if employee.employee_type == "Project-Based" %} selected {% endif %}>Project-Based</option>
-                </select>
-            </div>
-            <div class="col-6">
-                <label for="date_hired" class="col-form-label">Date Hired:</label>
-                <input
-                    type="date"
-                    class="form-control"
-                    id="date_hired{{ employee.id }}"
-                    name="date_hired"
-                    value="{% if employee.date_hired %}{{ employee.date_hired|date:"Y-m-d" }}{% endif %}"
-                    required
-                />
-            </div>
-        </div>
+          </div><div class="form-group row">
+          <div class="col-6">
+              <label for="email" class="col-form-label">Email:</label>
+              <input
+                  type="email"
+                  class="form-control"
+                  id="email{{ employee.id }}"
+                  name="email"
+                  value="{{ employee.email }}"
+                  required
+              />
+          </div>
+          <div class="col-6">
+              <label for="dob" class="col-form-label">Date of Birth:</label>
+              <input
+                  type="date"
+                  class="form-control"
+                  id="dob{{ employee.id }}"
+                  name="dob"
+                  value="{{ employee.dob|date:'Y-m-d' }}"
+                  required
+              />
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="address" class="col-form-label">Address:</label>
+          <input
+              type="text"
+              class="form-control"
+              id="address{{ employee.id }}"
+              name="address"
+              value="{{ employee.address }}"
+              required
+          />
+      </div>
+      <div class="form-group row">
+          <div class="col-6">
+              <label for="department" class="col-form-label">Department:</label>
+              <select
+                  name="department"
+                  id="department{{ employee.id }}"
+                  class="form-control mb-3"
+                  required
+              >
+                  <option hidden value="">No Department Selected</option>
+                  {% for department in departments %}
+                      <option value="{{ department.id }}"
+                          {% if department.id == employee.department.id %} selected {% endif %}>
+                          {{ department.department_name }}
+                      </option>
+                  {% endfor %}
+              </select>
+          </div>
+          <div class="col-6">
+              <label for="position" class="col-form-label">Position:</label>
+              <select
+                  name="position"
+                  id="position{{ employee.id }}"
+                  class="form-control mb-3"
+                  required
+              >
+                  <option hidden value="" selected>No Position Selected</option>
+                  {% for position in positions %}
+                  <option value="{{ position.id }}"
+                      {% if position.id == employee.position.id %} selected {% endif %}>
+                      {{ position.position }}
+                  </option>
+                  {% endfor %}
+              </select>
+          </div>
+      </div>
+      <div class="form-group row">
+          <div class="col-6">
+              <label for="hourly_rate" class="col-form-label">Hourly Rate:</label>
+              <input
+                  type="number"
+                  step="0.01"
+                  class="form-control"
+                  id="hourly_rate{{ employee.id }}"
+                  name="hourly_rate"
+                  value="{{ employee.hourly_rate }}"
+                  required
+                  min="0"
+              />
+          </div>
+          <div class="col-6">
+              <label for="Overtime_rate" class="col-form-label">Overtime Rate:</label>
+              <input
+                  type="number"
+                  step="0.01"
+                  class="form-control"
+                  id="Overtime_rate{{ employee.id }}"
+                  name="Overtime_rate"
+                  value="{{ employee.Overtime_rate }}"
+                  required
+                  min="0"
+              />
+          </div>
+      </div>
+      <div class="form-group row">
+          <div class="col-6">
+              <label for="employee_type" class="col-form-label">Employee Type:</label>
+              <select
+                  name="employee_type"
+                  id="employee_type{{ employee.id }}"
+                  class="form-control mb-3"
+                  required
+              >
+                  <option hidden value="" {% if not employee.employee_type %} selected {% endif %}>No Employee Type Selected</option>
+                  <option value="Full-Time" {% if employee.employee_type == "Full-Time" %} selected {% endif %}>Full-Time</option>
+                  <option value="Part-Time" {% if employee.employee_type == "Part-Time" %} selected {% endif %}>Part-Time</option>
+                  <option value="Flex-Time" {% if employee.employee_type == "Flex-Time" %} selected {% endif %}>Flex-Time</option>
+                  <option value="Project-Based" {% if employee.employee_type == "Project-Based" %} selected {% endif %}>Project-Based</option>
+              </select>
+          </div>
+          <div class="col-6">
+              <label for="date_hired" class="col-form-label">Date Hired:</label>
+              <input
+                  type="date"
+                  class="form-control"
+                  id="date_hired{{ employee.id }}"
+                  name="date_hired"
+                  value="{% if employee.date_hired %}{{ employee.date_hired|date:"Y-m-d" }}{% endif %}"
+                  required
+              />
+          </div>
+          <div class="form-group row">
+                <div class="col-6">
+                  <label for="deductions" class="col-form-label">Deductions: <p class="text-xs text-danger">* Check all applicable</p></label>
                 </div>
-                <div class="modal-footer">
-                  <button
-                    type="button"
-                    class="btn bg-gradient-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="submit"
-                    name="edit_employee"
-                    class="btn bg-gradient-success"
-                  >
-                    Update
-                  </button>
+              </div>
+              {% for loan_tax in loans_taxes %}
+                <div class="form-check mx-4">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="loan_tax_{{ loan_tax.id }}"
+                    name="loan_tax_{{ loan_tax.id }}"
+                    value="{{ loan_tax.id }}"
+                    {% if loan_tax.id in employee.deduction_ids %} checked {% endif %}
+                  />
+                  <label class="form-check-label" for="loan_tax_{{ loan_tax.id }}">
+                    {{ loan_tax.name }}
+                  </label>
                 </div>
-              </form>
-            </div>
+              {% endfor %}
+      </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn bg-gradient-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  name="edit_employee"
+                  class="btn bg-gradient-success"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-  {% endfor %}
+      </div>
+{% endfor %}
 
 <!-- View Modal -->
-  {% for employee in employees %}
-    <div
-      class="modal fade"
-      id="viewModal{{ employee.id }}"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="viewModalTitle{{ employee.id }}"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="right:0;">
+{% for employee in employees %}
+<div
+  class="modal fade"
+  id="viewModal{{ employee.id }}"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewModalTitle{{ employee.id }}"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="right:0;">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="viewModalTitle{{ employee.id }}">
@@ -1264,6 +1135,19 @@
                   disabled
               />
           </div>
+         <div class="col-3">
+            <label for="deductions" class="col-form-label">Deductions:</label>
+            {% for deduction in employee.sample_loans.all %}
+              <input
+                  type="text"
+                  class="form-control mb-2"
+                  id="deduction{{ deduction.id }}"
+                  name="deduction{{ deduction.id }}"
+                  value="{{ deduction.name }}: {{ deduction.amount }}"
+                  disabled
+              />
+            {% endfor %}
+          </div>
       </div>
               </div>
               <div class="modal-footer">
@@ -1280,7 +1164,7 @@
           </div>
         </div>
       </div>
-  {% endfor %}
+{% endfor %}
 
 <script>
 // Reset form fields when modal is shown

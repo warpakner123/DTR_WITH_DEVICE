@@ -100,9 +100,9 @@ def generate_pdf_dtr_view(request):
 
             context = {
                 'dtr_data': DTR_Data,
-                "period":period, 
-                "position":position.title(), 
-                "department":department.title(), 
+                "period":period,
+                "position":position.title(),
+                "department":department.title(),
                 "employee_name":employee_name.title(),
             }
 
@@ -356,11 +356,11 @@ def payroll(request):
                 period = format_dates(start_date,end_date)
                 dtr_data_json = format_dtr(dtr_records)
                 dtr_data = json.loads(dtr_data_json)
-               
+
                 return render(request, 'generate_dtr.html', {
                     'dtr_data': dtr_data,
                     'employee_name': f"{employee.first_name} {employee.last_name}",
-                    "position" : employee.position.position, 
+                    "position" : employee.position.position,
                     "department" : employee.department.department_name,
                     "period" : period
                 })
@@ -387,7 +387,7 @@ def logout_user(request):
     logout(request)
     return redirect('custom_login')
 
-def profile(request): 
+def profile(request):
     if request.method == 'POST':
         if 'edit_employee' in request.POST:
             form = EmployeeForm(request.POST)
@@ -404,6 +404,12 @@ def profile(request):
                 form = EmployeeForm(request.POST, instance=employee)
                 if form.is_valid():
                     form.save()
+                    # Update deductions
+                    deduction_ids = [value for key, value in request.POST.items() if key.startswith('loan_tax_')]
+                    employee.sample_loans.clear()  # Clear existing deductions
+                    for deduction_id in deduction_ids:
+                        deduction = LoansTaxes.objects.get(id=deduction_id)
+                        Deductions.objects.create(employee=employee, loanTaxes=deduction)
                     messages.success(request, 'Employee details updated successfully!')
                     return redirect('profile')
         elif 'delete_employee' in request.POST:
@@ -420,11 +426,11 @@ def profile(request):
             # Check if an employee with the same employee_id already exists
             if Employee.objects.filter(employee_id=employee_id).exists():
                 return HttpResponseBadRequest("Employee with this ID already exists!")
-            
+
             # Check if an employee with the same first name and last name already exists
             if Employee.objects.filter(first_name=first_name, last_name=last_name).exists():
                 return HttpResponseBadRequest("Employee with this name already exists!")
-            
+
             form = AddEmployeeForm(request.POST)  # Instantiate the AddEmployeeForm with POST data
             if form.is_valid():  # Validate the form
                 employee = form.save()   # Save the form data to the database
@@ -444,12 +450,12 @@ def profile(request):
         departments = Department.objects.exclude(department_name__iexact='hr')
         positions = Position.objects.exclude(position__iexact='hr')
         loans_taxes = LoansTaxes.objects.all()
-        
 
         for employee in employees:
             employee.full_name = f"{employee.first_name} {employee.last_name}".title()
             employee.department.department_name = employee.department.department_name.title()
             employee.position.position = employee.position.position.title()
+            employee.deduction_ids = set(employee.sample_loans.values_list('id', flat=True))  # Add this line
 
         for position in positions:
             position.position = position.position.title()
