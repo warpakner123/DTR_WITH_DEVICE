@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseBadRequest
-from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential, Deductions
+from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential, Deductions, Benefits
 from .forms import AddEmployeeForm, EmployeeForm, UploadFileForm, DTRForm
 from django.contrib import messages
 from computest import calculate_payroll, format_dates, format_dtr
@@ -123,7 +123,6 @@ def generate_pdf_dtr_view(request):
     except Exception as e:
         logging.error(f"Unexpected error in PDF generation: {e}")
         return HttpResponse("Error generating PDF.")
-
 
 def custom_login(request):
     if request.user.is_authenticated:
@@ -320,6 +319,7 @@ def payroll(request):
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
         deduct = request.POST.get('deductions')
+        selected_benefits = request.POST.getlist('benefits')  # Retrieve selected benefits
 
         if not all([employee_id, start_date, end_date]):
             messages.error(request, 'All fields are required.')
@@ -344,7 +344,9 @@ def payroll(request):
                 return redirect('payroll')
 
             if action == 'payslip':
-                payroll_data_json = calculate_payroll(dtr_records, start_date, end_date, deduct)
+                # Pass the list of benefit IDs directly
+                payroll_data_json = calculate_payroll(dtr_records, start_date, end_date, deduct, selected_benefits)
+                print(payroll_data_json)
                 payroll_data = json.loads(payroll_data_json)
 
                 return render(request, 'generate_payslip.html', {
@@ -353,16 +355,16 @@ def payroll(request):
                     'PaySlip_Data': payroll_data[0] if payroll_data else {}
                 })
             elif action == 'dtr':
-                period = format_dates(start_date,end_date)
+                period = format_dates(start_date, end_date)
                 dtr_data_json = format_dtr(dtr_records)
                 dtr_data = json.loads(dtr_data_json)
 
                 return render(request, 'generate_dtr.html', {
                     'dtr_data': dtr_data,
                     'employee_name': f"{employee.first_name} {employee.last_name}",
-                    "position" : employee.position.position,
-                    "department" : employee.department.department_name,
-                    "period" : period
+                    "position": employee.position.position,
+                    "department": employee.department.department_name,
+                    "period": period
                 })
 
         except Employee.DoesNotExist:
@@ -378,10 +380,12 @@ def payroll(request):
     employees = Employee.objects.filter(status=1).exclude(department__department_name__iexact='hr')
     for employee in employees:
         employee.full_name = f"{employee.first_name} {employee.last_name}".title()
-        employee.department.department_name= employee.department.department_name.title()
+        employee.department.department_name = employee.department.department_name.title()
         employee.position.position = employee.position.position.title()
 
-    return render(request, 'payroll.html', {'employees': employees})
+    benefits = Benefits.objects.all()  # Retrieve all benefits to display in the template
+
+    return render(request, 'payroll.html', {'employees': employees, 'benefits': benefits})
 
 def logout_user(request):
     logout(request)

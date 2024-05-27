@@ -14,7 +14,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
 # Import models
-from employeeDTR.models import Employee, Deductions, DTR
+from employeeDTR.models import Employee, Deductions, Benefits
 
 def print_loans_taxes_data(employee):
     """Print loan and tax deductions for a given employee."""
@@ -69,8 +69,7 @@ def calculate_hours_for_day(dtr_entries):
 
     return regular_hours, overtime_hours
 
-
-def calculate_payroll(dtr_records, start_date, end_date, deduct):
+def calculate_payroll(dtr_records, start_date, end_date, deduct, selected_benefits):
     """Calculate payroll for all employees within a specified period."""
     payroll_data = []
 
@@ -78,6 +77,9 @@ def calculate_payroll(dtr_records, start_date, end_date, deduct):
     grouped_by_employee = defaultdict(lambda: defaultdict(list))
     for record in dtr_records:
         grouped_by_employee[record.number][record.datetime.date()].append(record)
+
+    # Fetch selected benefits objects
+    selected_benefits_objects = Benefits.objects.filter(id__in=selected_benefits)
 
     # Process each employee
     for employee_id, dates in grouped_by_employee.items():
@@ -87,6 +89,7 @@ def calculate_payroll(dtr_records, start_date, end_date, deduct):
 
         total_regular_hours = 0
         total_overtime_hours = 0
+        total_additions = 0
 
         # Determine payroll period
         last_day_of_month = calendar.monthrange(start_date.year, start_date.month)[1]
@@ -114,7 +117,12 @@ def calculate_payroll(dtr_records, start_date, end_date, deduct):
         gross_pay_regular = total_regular_hours * employee.hourly_rate
         gross_pay_overtime = total_overtime_hours * employee.Overtime_rate
         total_deductions = 0 if deduct == 'no' else Deductions.objects.filter(employee=employee).aggregate(Sum('loanTaxes__amount'))['loanTaxes__amount__sum'] or 0
-        net_pay = gross_pay_regular + gross_pay_overtime - total_deductions
+
+        # Add selected benefits to total_additions
+        selected_benefits_total = sum([benefit.amount for benefit in selected_benefits_objects])
+        total_additions += selected_benefits_total
+
+        net_pay = gross_pay_regular + gross_pay_overtime + total_additions - total_deductions
 
         payroll_data.append({
             'employee_id': employee_id,
@@ -127,16 +135,17 @@ def calculate_payroll(dtr_records, start_date, end_date, deduct):
             'overtime_hours': f"{total_overtime_hours:.2f}",
             'gross_pay_regular': f" {gross_pay_regular:.2f}",
             'gross_pay_overtime': f" {gross_pay_overtime:.2f}",
-            'gross_pay': f" {gross_pay_regular + gross_pay_overtime:.2f}",
+            'gross_pay': f" {gross_pay_regular + gross_pay_overtime + total_additions:.2f}",
             'deductions_details': [{'name': deduction.loanTaxes.name, 'amount': f" {deduction.loanTaxes.amount:.2f}"} for deduction in Deductions.objects.filter(employee=employee)],
             'total_deductions': f" {total_deductions:.2f}",
+            'addition_details': [{'name': benefit.name, 'amount': f" {benefit.amount:.2f}"} for benefit in selected_benefits_objects],
+            'total_additions': f" {total_additions:.2f}",
             'net_pay': f" {net_pay:.2f}",
             'deduct': deduct,
         })
 
-
-        payroll_data_json = json.dumps(payroll_data, ensure_ascii=False)
-        return payroll_data_json
+    payroll_data_json = json.dumps(payroll_data, ensure_ascii=False)
+    return payroll_data_json
 
 def format_dtr(dtr_records):
     dtr_data = []

@@ -187,7 +187,20 @@
                                 <label class="mb-0">Gross Pay (Overtime):</label>
                                 <p class="mb-0 ms-2"> ₱ {{ data.gross_pay_overtime }}</p>
                             </div>
-
+                            {% if data.addition_details %}
+                                <div class="my-2 align-items-center">
+                                    <label class="mb-0">List of all Benefits/Bonuses for this Payroll:</label>
+                                    <ul>
+                                        {% for benefit in data.addition_details %}
+                                            <li>{{ benefit.name }} : ₱ {{ benefit.amount }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="my-2 d-flex align-items-center">
+                                    <label class="mb-0">Total Benefits/Bonuses:</label>
+                                    <p class="mb-0 ms-2"> ₱ {{ data.total_additions }}</p>
+                                </div>
+                            {% endif %}
                             {% if data.deduct == 'yes' %}
                             <div class="my-2 align-items-center">
                                 <label class="mb-0">List of all deductions for this pay period:</label>
