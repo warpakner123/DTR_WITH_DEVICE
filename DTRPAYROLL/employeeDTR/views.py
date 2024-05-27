@@ -284,7 +284,7 @@ def attendance(request):
             return redirect('attendance')
         elif 'confirmBulkDelete' in request.POST:
             ids_to_delete = request.POST.get('ids').split(',')
-            print(ids_to_delete)
+            # print(ids_to_delete)
             DTR.objects.filter(id__in=ids_to_delete).delete()
             messages.success(request, 'Selected DTR records have been deleted successfully.')
             return redirect('attendance')
@@ -346,7 +346,7 @@ def payroll(request):
             if action == 'payslip':
                 # Pass the list of benefit IDs directly
                 payroll_data_json = calculate_payroll(dtr_records, start_date, end_date, deduct, selected_benefits)
-                print(payroll_data_json)
+                # print(payroll_data_json)
                 payroll_data = json.loads(payroll_data_json)
 
                 return render(request, 'generate_payslip.html', {
@@ -441,7 +441,7 @@ def profile(request):
                 # deductions_data = request.POST.getlist('deductions')  # Get the list of deductions from the form
                 deduction_ids = [value for key, value in request.POST.items() if key.startswith('loan_tax_')]
 
-                print(deduction_ids)
+                # print(deduction_ids)
                 for deduction_id in deduction_ids:
                     deduction = LoansTaxes.objects.get(id=deduction_id)  # Retrieve the deduction object from the database
                     Deductions.objects.create(employee=employee, loanTaxes=deduction)  # Create Deductions object
@@ -723,7 +723,7 @@ def compensation(request):
             night_diffs = get_object_or_404(NightDifferential, pk=id)
 
             # Still need to be fixed
-            print(start_time,end_time,night_diffs.end_time,night_diffs.start_time)
+            # print(start_time,end_time,night_diffs.end_time,night_diffs.start_time)
             if NightDifferential.objects.filter(start_time__iexact=start_time, end_time=end_time).exists():
                 messages.error(request, 'A night differential with this time range already exists.')
                 return redirect('compensation')
