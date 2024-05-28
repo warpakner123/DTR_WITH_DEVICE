@@ -167,7 +167,6 @@ def format_dtr(dtr_records):
 
         dtr_data.append(newData)
     dtr_data_json = json.dumps(dtr_data, ensure_ascii=False)
-    print(dtr_data_json)
     return dtr_data_json
 
 def format_dates(date1, date2):

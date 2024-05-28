@@ -296,49 +296,88 @@
             </div>
           </div>
         </div>
-         <!-- List of Bonuses -->
+        <!-- List of Bonuses -->
         <div class="col-6">
-            <div class="card shadow-lg card-profile-bottom">
-                <div class="card-body">
-                    <div class="pb-0 d-flex justify-content-between align-items-center">
-                        <h6>List of Benefits & Bonuses</h6>
-                        <button type="button" class="btn btn-success btn-xs" data-bs-toggle="modal" data-bs-target="#addBonusModal">
-                            <i class="ni ni-fat-add ni-md" style="font-size: 20px; vertical-align: middle"></i>
-                        </button>
-                    </div>
-                    <div class="card-body px-0 pt-0 pb-2">
-                        {% if bonuses %}
-                        <div class="table-responsive p-0">
-                            <table id="bonusesTable" class="table table-striped table-hover align-items-left mb-0">
-                                <thead class="align-items-left">
-                                    <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Amount</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for bonus in bonuses %}
-                                    <tr>
-                                        <td class="align-middle text-sm mb-0">{{ bonus.name }}</td>
-                                        <td class="align-middle text-sm mb-0">
-                                            <span class="badge badge-sm bg-gradient-success">PHP {{ bonus.amount }}</span>
-                                        </td>
-                                        <td class="align-middle text-sm mb-0">
-                                            <i type="button" class="fas fa-edit text-secondary text-sm user-select-none p-2" data-bs-toggle="modal" data-bs-target="#editBonusModal{{ bonus.id }}"></i>
-                                            <i type="button" class="fas fa-trash-alt text-danger text-sm user-select-none" data-bs-toggle="modal" data-bs-target="#deleteBonusModal{{ bonus.id }}"></i>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        {% else %}
-                        <div class="text-center"><p>No Data Available.</p></div>
-                        {% endif %}
-                    </div>
+          <div class="card shadow-lg card-profile-bottom">
+            <div class="card-body">
+              <div
+                class="pb-0 d-flex justify-content-between align-items-center"
+              >
+                <h6>List of Benefits & Bonuses</h6>
+                <button
+                  type="button"
+                  class="btn btn-success btn-xs"
+                  data-bs-toggle="modal"
+                  data-bs-target="#addBenefitModal"
+                >
+                  <i
+                    class="ni ni-fat-add ni-md"
+                    style="font-size: 20px; vertical-align: middle"
+                  ></i>
+                </button>
+              </div>
+              <div class="card-body px-0 pt-0 pb-2">
+                {% if benefit %}
+                <div class="table-responsive p-0">
+                  <table
+                    id="benefitTable"
+                    class="table table-striped table-hover align-items-left mb-0"
+                  >
+                    <thead class="align-items-left">
+                      <tr>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Name
+                        </th>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Amount
+                        </th>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for data in benefit %}
+                      <tr>
+                        <td class="align-middle text-sm mb-0">
+                          {{ data.name }}
+                        </td>
+                        <td class="align-middle text-sm mb-0">
+                          <span class="badge badge-sm bg-gradient-success"
+                            >PHP {{ data.amount }}</span
+                          >
+                        </td>
+                        <td class="align-middle text-sm mb-0">
+                          <i
+                            type="button"
+                            class="fas fa-edit text-secondary text-sm user-select-none p-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editBenefitModal{{ data.id }}"
+                          ></i>
+                          <i
+                            type="button"
+                            class="fas fa-trash-alt text-danger text-sm user-select-none"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteBenefitModal{{ data.id }}"
+                          ></i>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
+                {% else %}
+                <div class="text-center"><p>No Data Available.</p></div>
+                {% endif %}
+              </div>
             </div>
+          </div>
         </div>
         <div id="error-message">
           {% if messages %} {% for message in messages %}
@@ -611,18 +650,16 @@
 
   <div
     class="modal fade"
-    id="addNightDiffModal"
+    id="addBenefitModal"
     tabindex="-1"
     role="dialog"
-    aria-labelledby="addNightDiffModalTitle"
+    aria-labelledby="addBenefitModalTitle"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addNightDiffModalLabel">
-            Add Night Differential
-          </h5>
+          <h5 class="modal-title" id="addBenefitModalLabel">Add Benefit</h5>
           <button
             type="button"
             class="btn-close"
@@ -636,39 +673,104 @@
           {% csrf_token %}
           <div class="modal-body">
             <div class="form-group">
-              <label for="night_diff_start_time" class="col-form-label"
-                >Start Time:</label
-              >
+              <label for="benefit_name" class="col-form-label">Name:</label>
               <input
-                type="time"
+                type="text"
                 class="form-control"
-                id="night_diff_start_time"
-                name="night_diff_start_time"
+                id="benefit_name"
+                name="benefit_name"
                 required
               />
             </div>
             <div class="form-group">
-              <label for="night_diff_end_time" class="col-form-label"
-                >End Time:</label
+              <label for="benefit_amount" class="col-form-label">Amount:</label>
+              <input
+                type="number"
+                class="form-control"
+                id="benefit_amount"
+                name="benefit_amount"
+                required
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn bg-gradient-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              name="add_benefit_submit"
+              class="btn bg-gradient-success"
+            >
+              Add
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% for data in benefit %}
+  <div
+    class="modal fade"
+    id="editBenefitModal{{ data.id }}"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="editBenefitModalTitle{{ data.id }}"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editBenefitModalLabel{{ data.id }}">
+            Edit Benefit
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <input
+              id="edit_benefit_id"
+              name="edit_benefit_id"
+              value="{{ data.id }}"
+              hidden
+            />
+            <div class="form-group">
+              <label for="edit_benefit_name" class="col-form-label"
+                >Name:</label
               >
               <input
-                type="time"
+                type="text"
                 class="form-control"
-                id="night_diff_end_time"
-                name="night_diff_end_time"
+                id="edit_benefit_name"
+                name="edit_benefit_name"
+                value="{{ data.name }}"
                 required
               />
             </div>
             <div class="form-group">
-              <label for="night_diff_rate_multiplier" class="col-form-label"
-                >Rate Multiplier:</label
+              <label for="edit_benefit_amount" class="col-form-label"
+                >Amount:</label
               >
               <input
                 type="number"
-                step="0.01"
                 class="form-control"
-                id="night_diff_rate_multiplier"
-                name="night_diff_rate_multiplier"
+                step="0.01"
+                id="edit_benefit_amount"
+                name="edit_benefit_amount"
+                value="{{ data.amount }}"
                 required
                 min="0"
               />
@@ -684,106 +786,7 @@
             </button>
             <button
               type="submit"
-              name="add_night_diff_submit"
-              class="btn bg-gradient-success"
-            >
-              Add
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  {% for night_diff in night_diffs %}
-  <div
-    class="modal fade"
-    id="editNightDiffModal{{ night_diff.id }}"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="editNightDiffModalTitle{{ night_diff.id }}"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5
-            class="modal-title"
-            id="editNightDiffModalLabel{{ night_diff.id }}"
-          >
-            Edit Night Differential
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <form method="post">
-          {% csrf_token %}
-          <div class="modal-body">
-            <input
-              id="edit_night_diff_id"
-              name="edit_night_diff_id"
-              value="{{ night_diff.id }}"
-              hidden
-            />
-            <div class="form-group">
-              <label for="edit_night_diff_start_time" class="col-form-label"
-                >Start Time:</label
-              >
-              <input
-                type="time"
-                class="form-control"
-                id="edit_night_diff_start_time"
-                name="edit_night_diff_start_time"
-                value="{{ night_diff.start_time }}"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="edit_night_diff_end_time" class="col-form-label"
-                >End Time:</label
-              >
-              <input
-                type="time"
-                class="form-control"
-                id="edit_night_diff_end_time"
-                name="edit_night_diff_end_time"
-                value="{{ night_diff.end_time }}"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label
-                for="edit_night_diff_rate_multiplier"
-                class="col-form-label"
-                >Rate Multiplier:</label
-              >
-              <input
-                type="number"
-                class="form-control"
-                id="edit_night_diff_rate_multiplier"
-                name="edit_night_diff_rate_multiplier"
-                value="{{ night_diff.rate_multiplier }}"
-                required
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn bg-gradient-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-            <button
-              type="submit"
-              name="edit_night_diff_submit"
+              name="edit_benefit_submit"
               class="btn bg-gradient-success"
             >
               Update
@@ -793,23 +796,20 @@
       </div>
     </div>
   </div>
-  {% endfor %} {% for night_diff in night_diffs %}
+  {% endfor %} {% for data in benefit %}
   <div
     class="modal fade"
-    id="deleteNightDiffModal{{ night_diff.id }}"
+    id="deleteBenefitModal{{ data.id }}"
     tabindex="-1"
     role="dialog"
-    aria-labelledby="deleteNightDiffModalTitle{{ night_diff.id }}"
+    aria-labelledby="deleteBenefitModalTitle{{ data.id }}"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5
-            class="modal-title"
-            id="deleteNightDiffModalLabel{{ night_diff.id }}"
-          >
-            Delete Position
+          <h5 class="modal-title" id="deleteBenefitModalLabel{{ data.id }}">
+            Delete Benefit
           </h5>
           <button
             type="button"
@@ -824,12 +824,12 @@
           {% csrf_token %}
           <div class="modal-body">
             <input
-              id="delete_night_diff_id"
-              name="delete_night_diff_id"
-              value="{{ night_diff.id }}"
+              id="delete_benefit_id"
+              name="delete_benefit_id"
+              value="{{ data.id }}"
               hidden
             />
-            <p>Are you sure you want to delete this night differential?</p>
+            <p>Are you sure you want to delete this loan/tax?</p>
           </div>
           <div class="modal-footer">
             <button
@@ -841,7 +841,7 @@
             </button>
             <button
               type="submit"
-              name="delete_night_diff_submit"
+              name="delete_benefit_submit"
               class="btn bg-gradient-success"
             >
               Delete
