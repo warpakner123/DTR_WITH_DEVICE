@@ -393,7 +393,7 @@
                     <thead class="align-items-left">
                       <tr>
                         <th>
-                            <input type="checkbox" id="selectAll">
+                            <input type="checkbox" id="selectAll" name="selectAll"  value="true">
                         </th>
                         <th
                           class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -499,6 +499,7 @@
 
     <!--   Core JS Files   -->
     <script>
+        
       document.addEventListener('DOMContentLoaded', function () {
           const selectAllCheckbox = document.getElementById('selectAll');
           const rowCheckboxes = document.querySelectorAll('.row-checkbox');
@@ -506,40 +507,47 @@
           const bulkDeleteModal = new bootstrap.Modal(document.getElementById('bulkDeleteModal'));
           const confirmBulkDeleteButton = document.getElementById('confirmBulkDelete');
           const bulkDeleteIdsInput = document.getElementById('bulkDeleteIds');
+          const table = $('#attendanceTable').DataTable({
+              "columnDefs": [{
+                  "targets": 0, 
+                  "orderable": false ,
+              }],
+              "order": []
+          });   
 
           // Handle select all checkbox change
           selectAllCheckbox.addEventListener('change', function () {
-              rowCheckboxes.forEach(checkbox => {
-                  checkbox.checked = selectAllCheckbox.checked;
-              });
-              toggleBulkDeleteBtn();
+            const isAllChecked = selectAllCheckbox.checked;
+
+            table.rows().every(function () {
+                var row = this.node();
+                $('input[type="checkbox"]', row).prop('checked', isAllChecked);
+            });
+            toggleBulkDeleteBtn();
           });
 
           // Handle individual row checkbox change
-          rowCheckboxes.forEach(checkbox => {
-              checkbox.addEventListener('change', function () {
-                  toggleBulkDeleteBtn();
-              });
+          table.on('change', '.row-checkbox', function () {
+              toggleBulkDeleteBtn(false);
           });
-        
+
+          bulkDeleteBtn.addEventListener('click', function () {
+              bulkDeleteModal.show();
+          });
+
           confirmBulkDeleteButton.addEventListener('click', function () {
-          const selectedIds = Array.from(rowCheckboxes)
-            .filter(checkbox => checkbox.checked)
-            .map(checkbox => checkbox.value);
-          bulkDeleteIdsInput.value = selectedIds.join(',');
-          bulkDeleteForm.submit();
-        });
+            const selectedIds = Array.from(rowCheckboxes)
+              .filter(checkbox => checkbox.checked)
+              .map(checkbox => checkbox.value);
+            bulkDeleteIdsInput.value = selectedIds.join(',');
+            bulkDeleteForm.submit();
+          });
 
           // Toggle bulk delete button state
           function toggleBulkDeleteBtn() {
               const anyChecked = Array.from(rowCheckboxes).some(checkbox => checkbox.checked);
               bulkDeleteBtn.disabled = !anyChecked;
           }
-
-          // Handle bulk delete button click
-          bulkDeleteBtn.addEventListener('click', function () {
-              bulkDeleteModal.show();
-          });
       });
 
 
@@ -566,15 +574,7 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.js"></script>
-    <script>
-        $('#attendanceTable').DataTable({
-        "columnDefs": [{
-            "targets": 0, 
-            "orderable": false ,
-        }],
-        "order": []
-    });
-    </script>
+   
 
 
   </body>

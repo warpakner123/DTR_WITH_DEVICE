@@ -276,16 +276,24 @@ def attendance(request):
                 messages.success(request, 'DTR entry successfully edited!')
                 return redirect('attendance')
 
-        elif 'delete_dtr' in request.POST:
+        elif 'delete_dtr' in request.POST: 
             dtr_id = request.POST.get('dtr_id')
             dtr_instance = get_object_or_404(DTR, pk=dtr_id)
             dtr_instance.delete()
             messages.success(request, 'DTR entry successfully deleted!')
             return redirect('attendance')
         elif 'confirmBulkDelete' in request.POST:
-            ids_to_delete = request.POST.get('ids').split(',')
-            # print(ids_to_delete)
-            DTR.objects.filter(id__in=ids_to_delete).delete()
+            delete_all = request.POST.get('isAllChecked')
+            ids_to_delete = request.POST.get('ids')
+
+            if ids_to_delete:
+                ids_to_delete = ids_to_delete.split(',')
+            if delete_all == 'true':
+                DTR.objects.all().delete()
+            else:
+                if ids_to_delete:
+                    DTR.objects.filter(id__in=ids_to_delete).delete()
+
             messages.success(request, 'Selected DTR records have been deleted successfully.')
             return redirect('attendance')
 
@@ -338,7 +346,8 @@ def payroll(request):
             start_date = datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0)
             end_date = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1, seconds=-1)
 
-            dtr_records = DTR.objects.filter(number=employee_id, datetime__range=[start_date, end_date])
+            dtr_records = DTR.objects.filter(number=employee_id, datetime__range=[start_date, end_date]).order_by('datetime')
+
             if not dtr_records.exists():
                 messages.error(request, 'No DTR records found for the selected employee and date range.')
                 return redirect('payroll')
@@ -441,7 +450,6 @@ def profile(request):
                 # deductions_data = request.POST.getlist('deductions')  # Get the list of deductions from the form
                 deduction_ids = [value for key, value in request.POST.items() if key.startswith('loan_tax_')]
 
-                # print(deduction_ids)
                 for deduction_id in deduction_ids:
                     deduction = LoansTaxes.objects.get(id=deduction_id)  # Retrieve the deduction object from the database
                     Deductions.objects.create(employee=employee, loanTaxes=deduction)  # Create Deductions object
@@ -688,79 +696,74 @@ def compensation(request):
                 messages.error(request, f'An error occurred: {e}')
 
                 return redirect('compensation')
-        elif 'add_night_diff_submit' in request.POST:
-            start_time = request.POST.get('night_diff_start_time')
-            end_time = request.POST.get('night_diff_end_time')
-            rate_multiplier = request.POST.get('night_diff_rate_multiplier')
+        elif 'add_benefit_submit' in request.POST:
+            name = request.POST.get('benefit_name')
+            amount = request.POST.get('benefit_amount')
 
-            if not all([start_time, end_time,rate_multiplier ]):
+            if not all([name, amount]):
                 messages.error(request, 'All fields are required.')
                 return redirect('compensation')
 
-            # Still need to be fixed
-            if NightDifferential.objects.filter(start_time__iexact=start_time, end_time=end_time).exists():
-                messages.error(request, 'A night differential with this time range already exists.')
+            if Benefits.objects.filter(name__iexact=name).exists():
+                messages.error(request, 'A benefit with this name already exists.')
                 return redirect('compensation')
 
             try:
-                NightDifferential.objects.create(start_time=start_time,end_time=end_time,rate_multiplier=rate_multiplier )
-                messages.success(request, 'Night Differential added successfully.')
+                Benefits.objects.create(name=name, amount=amount )
+                messages.success(request, 'Benefit added successfully.')
                 return redirect('compensation')
 
             except Exception as e:
                 messages.error(request, f'An error occurred: {e}')
                 return redirect('compensation')
-        elif 'edit_night_diff_submit' in request.POST:
-            id = request.POST.get('edit_night_diff_id')
-            start_time = request.POST.get('edit_night_diff_start_time')
-            end_time = request.POST.get('edit_night_diff_end_time')
-            rate_multiplier = request.POST.get('edit_night_diff_rate_multiplier')
+        elif 'edit_benefit_submit' in request.POST:
+            id = request.POST.get('edit_benefit_id')
+            name = request.POST.get('edit_benefit_name')
+            amount = request.POST.get('edit_benefit_amount')
 
-            if not all([start_time, end_time,rate_multiplier ]):
+            if not all([name, amount]):
                 messages.error(request, 'All fields are required.')
                 return redirect('compensation')
 
-            night_diffs = get_object_or_404(NightDifferential, pk=id)
+            benefit = get_object_or_404(Benefits, pk=id)
 
-            # Still need to be fixed
-            # print(start_time,end_time,night_diffs.end_time,night_diffs.start_time)
-            if NightDifferential.objects.filter(start_time__iexact=start_time, end_time=end_time).exists():
-                messages.error(request, 'A night differential with this time range already exists.')
+            if Benefits.objects.exclude(pk=id).filter(name__iexact=name).exists():
+                messages.error(request, 'A benefit with this name already exists.')
                 return redirect('compensation')
 
             try:
-                night_diffs.start_time = start_time
-                night_diffs.end_time = end_time
-                night_diffs.rate_multiplier = rate_multiplier
-                night_diffs.save()
-                messages.success(request, 'Night Differential updated successfully.')
+                benefit.name = name
+                benefit.amount = amount
+                benefit.save()
+                messages.success(request, 'Benefit updated successfully.')
                 return redirect('compensation')
 
             except Exception as e:
                 messages.error(request, f'An error occurred: {e}')
                 return redirect('compensation')
-        elif 'delete_night_diff_submit' in request.POST:
-            id = request.POST.get('delete_night_diff_id')
+        elif 'delete_benefit_submit' in request.POST:
+            id = request.POST.get('delete_benefit_id')
 
-            night_diffs = get_object_or_404(NightDifferential, pk=id)
+            benefit = get_object_or_404(Benefits, pk=id)
 
             try:
-                night_diffs.delete()
-                messages.success(request, 'Night Differential deleted successfully.')
+                benefit.delete()
+                messages.success(request, 'Benefit deleted successfully.')
                 return redirect('compensation')
             except Exception as e:
                 messages.error(request, f'An error occurred: {e}')
-
                 return redirect('compensation')
     else:
         loans_taxes = LoansTaxes.objects.annotate(total=Count('employee'),employees_list=Count('employee__id', distinct=True),)
-        night_diffs = NightDifferential.objects.all()
+        benefit = Benefits.objects.all()
 
         for loan_tax in loans_taxes:
             loan_tax.name = loan_tax.name.title()
+        for data in benefit:
+            data.name = data.name.title()
 
         context = {
-            "night_diffs":night_diffs,
+            "benefit":benefit,
             "loans_taxes":loans_taxes,
         }
         return render(request, 'compensation.html', context)
