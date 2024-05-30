@@ -48,7 +48,7 @@
 
         <div class="separator"></div>
 
-        <!-- {% if PaySlip_Data.addition_details %}
+        {% if PaySlip_Data.addition_details %}
         <p>List of all Benefits/Bonuses:</p>
         <div class="separator"></div>
         <ul>
@@ -56,12 +56,11 @@
                 <li>{{ addition.name }} : <strong>Php</strong> {{ addition.amount }}</li>
             {% endfor %}
         </ul>
-        <div class="separator"></div>
         <p>Total Benefits/Bonuses: <strong>Php</strong> {{ PaySlip_Data.total_additions }}</p>
-        {% endif %} -->
-
+        {% endif %}
 
         <div class="separator"></div>
+        <p>Gross Pay (Total): <strong>Php</strong> {{ PaySlip_Data.gross_pay }}</p>
 
         {% if PaySlip_Data.deduct == 'yes' %}
         <p>List of all deductions for this pay period:</p>
@@ -74,8 +73,6 @@
         <div class="separator"></div>
         <p>Total Amount of Deductions: <strong>Php</strong> {{ PaySlip_Data.total_deductions }}</p>
         {% endif %}
-        <div class="separator"></div>
-        <p>Gross Pay: <strong>Php</strong> {{ PaySlip_Data.gross_pay }}</p>
         <div class="separator"></div>
         <p>Net Pay: <strong>Php</strong> {{ PaySlip_Data.net_pay }}</p>
         <div class="separator"></div>

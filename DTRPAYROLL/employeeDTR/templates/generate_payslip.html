@@ -201,6 +201,10 @@
                                     <p class="mb-0 ms-2"> ₱ {{ data.total_additions }}</p>
                                 </div>
                             {% endif %}
+                            <div class="my-2 d-flex align-items-center">
+                                <label class="mb-0">Gross Pay (Total):</label>
+                                <p class="mb-0 ms-2">₱ {{ data.gross_pay }}</p>
+                            </div>
                             {% if data.deduct == 'yes' %}
                             <div class="my-2 align-items-center">
                                 <label class="mb-0">List of all deductions for this pay period:</label>
@@ -215,10 +219,6 @@
                                 <p class="mb-0 ms-2">₱ {{ data.total_deductions }}</p>
                             </div>
                             {% endif %}
-                            <div class="my-2 d-flex align-items-center">
-                                <label class="mb-0">Gross Pay:</label>
-                                <p class="mb-0 ms-2">₱ {{ data.gross_pay }}</p>
-                            </div>
                             <div class="my-2 d-flex align-items-center">
                                 <label class="mb-0">Net Pay:</label>
                                 <p class="mb-0 ms-2">₱ {{ data.net_pay }}</p>
