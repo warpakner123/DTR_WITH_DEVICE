@@ -65,6 +65,28 @@
         background-color: #f2f2f2; 
       }
 
+
+      .custom-hours-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .custom-hours-table th,
+      .custom-hours-table td {
+        border: 1px solid #a9a9a9;
+        padding: 6px;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      .custom-hours-table th {
+        font-weight: bold;
+      }
+
+      .custom-hours-table tbody tr:nth-child(even) td {
+        background-color: #f2f2f2; 
+      }
+
     </style>
   </head>
   <body>
@@ -95,7 +117,41 @@
         </tbody>
       </table>
 
-      <div style="margin-top:20px">
+      <div style="margin-top:20px" >
+        <table class="custom-hours-table"  >
+           <thead>
+            <tr>
+              <th class="custom-header">Week No.</th>
+              <th class="custom-header">Date Range</th>
+              <th class="custom-header">Hours</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for hours in weekly_hours %}
+            <tr>
+              <td>{{hours.week_no}}</td>
+              <td>{{hours.date_range}}</td>
+              <td>{{hours.total_hours}}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <th class="custom-header"
+              >
+              Grand Total Hours
+              </th>
+              <td
+              >
+              </td>
+              <th class="custom-header"
+              >
+              {{grand_total_hours}} Hours
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:30px">
       <table class="custom-data-table">
         <thead>
           <tr>
