@@ -84,19 +84,32 @@ def generate_pdf_dtr_view(request):
             position = request.POST.get('position', '')
             department = request.POST.get('department', '')
             employee_name = request.POST.get('employee_name', '')
+            total_hours_weekly_literal = request.POST.get('total_hours_weekly', '')
+            grand_total_hours = request.POST.get('grand_total_hours', '')
 
             # Ensure that we have data to put into our context
-            if not all([dtr_data_literal, period, position,department, employee_name]):
+            if not all([dtr_data_literal, period, position,department, employee_name, total_hours_weekly_literal, grand_total_hours]):
                 raise ValueError("No DTR data provided.")
 
             if isinstance(dtr_data_literal, str):
                 try:
                     DTR_Data = ast.literal_eval(dtr_data_literal)
+
                 except (ValueError, SyntaxError) as e:
                     logging.error(f"Error converting string to Python object: {e}")
                     return HttpResponse("Error parsing DTR data.")
             else:
                 DTR_Data = dtr_data_literal
+
+            if isinstance(total_hours_weekly_literal, str):
+                try:
+                    Weekly_Hours = ast.literal_eval(total_hours_weekly_literal)
+
+                except (ValueError, SyntaxError) as e:
+                    logging.error(f"Error converting string to Python object: {e}")
+                    return HttpResponse("Error parsing DTR data.")
+            else:
+                Weekly_Hours = total_hours_weekly_literal
 
             context = {
                 'dtr_data': DTR_Data,
@@ -104,6 +117,8 @@ def generate_pdf_dtr_view(request):
                 "position":position.title(),
                 "department":department.title(),
                 "employee_name":employee_name.title(),
+                "weekly_hours":Weekly_Hours,
+                "grand_total_hours":grand_total_hours,
             }
 
             html_string = render_to_string('DTR_Template.html', context)
@@ -352,12 +367,11 @@ def payroll(request):
                 messages.error(request, 'No DTR records found for the selected employee and date range.')
                 return redirect('payroll')
 
-            if action == 'payslip':
-                # Pass the list of benefit IDs directly
-                payroll_data_json = calculate_payroll(dtr_records, start_date, end_date, deduct, selected_benefits)
-                # print(payroll_data_json)
-                payroll_data = json.loads(payroll_data_json)
+            # Pass the list of benefit IDs directly
+            payroll_data_json = calculate_payroll(dtr_records, start_date, end_date, deduct, selected_benefits)
+            payroll_data = json.loads(payroll_data_json)
 
+            if action == 'payslip':
                 return render(request, 'generate_payslip.html', {
                     'payroll_data': payroll_data,
                     'employee_name': f"{employee.first_name} {employee.last_name}",
@@ -365,15 +379,21 @@ def payroll(request):
                 })
             elif action == 'dtr':
                 period = format_dates(start_date, end_date)
-                dtr_data_json = format_dtr(dtr_records)
-                dtr_data = json.loads(dtr_data_json)
+                dtr_data_json = format_dtr(dtr_records, start_date, end_date, payroll_data_json)
+                loaded_data = json.loads(dtr_data_json)
+                grand_total_hours = loaded_data[0]["grand_total_hours"]
+                total_hours_weekly = loaded_data[0]["total_hours_weekly"]
 
+                dtr_data = json.loads(dtr_data_json)
+                print(total_hours_weekly)
                 return render(request, 'generate_dtr.html', {
                     'dtr_data': dtr_data,
                     'employee_name': f"{employee.first_name} {employee.last_name}",
                     "position": employee.position.position,
                     "department": employee.department.department_name,
-                    "period": period
+                    "period": period,
+                    "grand_total_hours":grand_total_hours,
+                    "total_hours_weekly":total_hours_weekly
                 })
 
         except Employee.DoesNotExist:

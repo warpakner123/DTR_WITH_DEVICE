@@ -225,6 +225,67 @@
                                 </tr>
                             </tbody>
                         </table>
+
+                        <div class="mx-10">
+                            <table class=" table table-bordered align-items-left mb-6 mt-4">
+                                <thead class="align-items-left">
+                                    <tr>
+                                        <th
+                                        class="text-secondary text-xs font-weight-bolder opacity-7"
+                                        >
+                                        Week No.
+                                        </th>
+                                        <th
+                                        class="text-secondary text-xs font-weight-bolder opacity-7"
+                                        >
+                                        Date Range
+                                        </th>
+                                        <th
+                                        class="text-secondary text-xs font-weight-bolder opacity-7"
+                                        >
+                                        Hours
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for hours in total_hours_weekly %}
+                                    <tr>
+                                        <th
+                                        class="text-uppercase text-xs"
+                                        >
+                                        &nbsp;{{hours.week_no}}
+                                        </th>
+                                        <th
+                                        class="text-uppercase text-xs"
+                                        >
+                                        &nbsp;{{hours.date_range}}
+                                        </th>
+                                        <th
+                                        class="text-uppercase text-xs"
+                                        >
+                                        &nbsp;{{hours.total_hours}}
+                                        </th>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <th
+                                        class="text-secondary text-xs font-weight-bolder opacity-7 p-3"
+                                        >
+                                        Grand Total Hours
+                                        </th>
+                                        <th
+                                        class="text-uppercase text-xs"
+                                        >
+                                        </th>
+                                        <th
+                                        class="text-uppercase text-xs py-3"
+                                        >
+                                        {{grand_total_hours}} Hours
+                                        </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                         <div class="table-responsive p-0">
                             <table id="dtrTable" style="width:100%;" class="table table-striped table-bordered table-hover align-items-left mb-0 mt-4">
                                 <thead class="align-items-left">
@@ -270,7 +331,7 @@
                                             {{data.mode}}
                                         </td>
                                         <td class="align-middle text-sm">
-                                            {% if data.remarks == "CHECK-IN" %}
+                                            {% if data.remarks == "MODE IN" %}
                                             <span class="badge badge-sm bg-gradient-success">
                                                 {{data.remarks}}
                                             </span>
@@ -296,6 +357,9 @@
                     <input type="hidden" name="position" value="{{ position|safe }}">                    
                     <input type="hidden" name="department" value="{{ department|safe }}">
                     <input type="hidden" name="employee_name" value="{{ employee_name|safe }}">
+                    <input type="hidden" name="total_hours_weekly" value="{{ total_hours_weekly|safe }}">
+                    <input type="hidden" name="grand_total_hours" value="{{ grand_total_hours|safe }}">
+
                     <button type=submit class="btn btn-primary btn-md text-md ">
                         <i
                             class="ni ni-cloud-download-95 m-2"
@@ -338,7 +402,5 @@
         dataTable.order([1, 'desc']).draw();
 
     </script>
-    
 </body>
-
 </html>

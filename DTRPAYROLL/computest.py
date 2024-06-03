@@ -5,7 +5,7 @@ from datetime import datetime, date
 from collections import defaultdict
 import calendar
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 
 
@@ -148,22 +148,98 @@ def calculate_payroll(dtr_records, start_date, end_date, deduct, selected_benefi
     payroll_data_json = json.dumps(payroll_data, ensure_ascii=False)
     return payroll_data_json
 
-def format_dtr(dtr_records):
+def format_dtr(dtr_records, start_date, end_date, payroll_data):
     dtr_data = []
+
+    loaded_data = json.loads(payroll_data)
+    total_hours_worked = loaded_data[0]["total_hours_worked"]
+
+    payroll_data = []
+
+    # Group DTR records by employee and date
+    grouped_by_employee = defaultdict(lambda: defaultdict(list))
+    for record in dtr_records:
+        grouped_by_employee[record.number][record.datetime.date()].append(record)
+
+    # Process each employee
+    for employee_id, dates in grouped_by_employee.items():
+        employee = Employee.objects.filter(employee_id=employee_id).first()
+        if not employee:
+            continue  # Skip if employee not found
+
+        total_regular_hours = 0
+        total_overtime_hours = 0
+
+        # Determine payroll period
+        last_day_of_month = calendar.monthrange(start_date.year, start_date.month)[1]
+        if start_date.day == 1 and (15 >= end_date.day or end_date.day < last_day_of_month):
+            period = '1-15'
+            period_end = datetime(start_date.year, start_date.month, 15).date()  # Convert to date
+        elif start_date.day == 16 and end_date.day <= last_day_of_month:
+            period = f'16-{last_day_of_month}'
+            period_end = datetime(start_date.year, start_date.month, last_day_of_month).date()  # Convert to date
+        elif start_date.day == 1 and end_date.day == last_day_of_month:
+            period = 'Full Month'
+            period_end = end_date.date()  # Assuming end_date is a datetime object; convert to date
+        else:
+            period = 'Custom Period'
+            period_end = end_date.date()  # Convert to date
+
+        weekly_hours = defaultdict(lambda: {'regular_hours': 0, 'overtime_hours': 0})
+
+        for date, dtr_entries in dates.items():
+            # Ensure date is compared with period_end as date objects
+            if date > period_end:
+                continue
+            regular_hours, overtime_hours = calculate_hours_for_day(dtr_entries)
+            total_regular_hours += regular_hours
+            total_overtime_hours += overtime_hours
+
+            # Calculate week number and update weekly hours
+            week_start = date - timedelta(days=date.weekday())  # Monday of the current week
+            week_end = week_start + timedelta(days=6)
+            weekly_hours[(week_start, week_end)]['regular_hours'] += regular_hours
+            weekly_hours[(week_start, week_end)]['overtime_hours'] += overtime_hours
+
+        total_hours_worked = total_regular_hours + total_overtime_hours
+        week_index = 1
+        formatted_weekly_hours = []
+
+        for (week_start, week_end), hours in weekly_hours.items():
+            formatted_weekly_hours.append({
+                'week_no': f"Week {week_index}",
+                'date_range': f"{week_start.strftime('%b %d, %Y')} - {week_end.strftime('%b %d, %Y')}",
+                'total_hours': f"{hours['regular_hours'] + hours['overtime_hours']:.2f}",
+                'regular_hours': f"{hours['regular_hours']:.2f}",
+                'overtime_hours': f"{hours['overtime_hours']:.2f}"
+            })
+            week_index += 1
+
+
+        payroll_data.append({
+            'weekly_hours': formatted_weekly_hours
+        })
+        # 'total_hours_worked': f"{total_regular_hours + total_overtime_hours:.2f}",
+
+
+    # loaded_hours_data = json.loads(payroll_data)
+    total_hours_weekly = payroll_data[0]["weekly_hours"]
 
     for data in dtr_records:
         day = data.datetime.strftime('%a'),
         date = data.datetime.strftime('%d/%m/%Y'),
         time = data.datetime.strftime('%I:%M %p'),
         mode = "In" if data.status == "C/In" else "Out",
-        remarks = "CHECK-IN" if data.status == "C/In" else "CHECK-OUT",
+        remarks = "MODE IN" if data.status == "C/In" else "MODE OUT",
 
         newData = {
         "day": day[0],  # Extracting the string directly
         "date": date[0],  # Extracting the string directly
         "time": time[0],  # Extracting the string directly
         "mode": mode[0],  # Extracting the string directly
-        "remarks": remarks[0]  # Extracting the string directly
+        "remarks": remarks[0]  ,# Extracting the string directly
+        "grand_total_hours":total_hours_worked,
+        "total_hours_weekly": total_hours_weekly
     }
 
         dtr_data.append(newData)
