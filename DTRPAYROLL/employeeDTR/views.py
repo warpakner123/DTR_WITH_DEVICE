@@ -291,7 +291,7 @@ def attendance(request):
                 messages.success(request, 'DTR entry successfully edited!')
                 return redirect('attendance')
 
-        elif 'delete_dtr' in request.POST: 
+        elif 'delete_dtr' in request.POST:
             dtr_id = request.POST.get('dtr_id')
             dtr_instance = get_object_or_404(DTR, pk=dtr_id)
             dtr_instance.delete()
@@ -385,7 +385,6 @@ def payroll(request):
                 total_hours_weekly = loaded_data[0]["total_hours_weekly"]
 
                 dtr_data = json.loads(dtr_data_json)
-                print(total_hours_weekly)
                 return render(request, 'generate_dtr.html', {
                     'dtr_data': dtr_data,
                     'employee_name': f"{employee.first_name} {employee.last_name}",
