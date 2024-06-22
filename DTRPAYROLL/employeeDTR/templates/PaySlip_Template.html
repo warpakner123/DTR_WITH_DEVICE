@@ -25,7 +25,7 @@
             margin: 0 auto;
             padding: 30px;
             border: 1px solid #000;
-            font-size: 14px;
+            font-size: 12px;
             box-sizing: border-box;
         }
 
@@ -35,12 +35,12 @@
         }
 
         .payslip-section {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .separator {
             border-bottom: 1px solid #000;
-            margin: 5px 0;
+            margin: 2px 0;
         }
 
         .bold {
@@ -48,10 +48,10 @@
         }
 
         .section-titleV2 {
-            margin-bottom: 10px;
+            margin-bottom: 3px;
             padding: 100%;
-            padding-left: 40px;
-            padding-top: 25px;
+            padding-left: 10px;
+            padding-top: 5px;
         }
 
         .section-title {
@@ -64,30 +64,88 @@
         }
 
         .table td {
-            padding: 10px 20px;
+            padding: 3px 5px;
             box-sizing: border-box;
         }
 
         .amount {
             text-align: right;
         }
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .header-content h1 {
+            flex: 1;
+            margin-bottom: 8px;
+        }
+        .header-content img {
+            position: absolute;
+            right: 0;
+            width: 80px;
+            height: auto;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            text-align: center;
+        }
+        .row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .col-md-6 {
+            flex: 1;
+        }
+
     </style>
     <title>Electronic Employee Payslip</title>
 </head>
 <body>
-    <div style="position: absolute; top: 0; right: 0; text-align: right; margin-bottom: 10px;">
+    <!--
+    <div style="position: absolute; top: 0; right: 0; text-align: left; margin-bottom: 10px;">
+        
         <img src="employeeDTR/templates/assets/img/logos/company_logo.jpg" alt="Company Logo" style="width: 180px; height: auto;">
+       <h1></h1>
     </div>
+    -->
+    <div class="container custom-container">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                    <div class="header-content">
+                        <h1>
+                            <!-- Electronic Daily Attendance Record and Manual Daily Attendance Record -->
+                            RICOR MILLS CORP. CASSAVA STARCH PLANT PAYSLIP &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <img src="employeeDTR/templates/assets/img/logos/company_logo.jpg" alt="Company Logo">
+                        </h1>
+                    </div>
+            </div>
+        </div>
+      </div>
     <div class="payslip-container">
         <div class="payslip-section">
             <table class="table">
                 <tr>
-                    <td>Employee Name:</td>
-                    <td class="amount"><span class="bold">{{ PaySlip_Data.complete_name }}</span></td>
+                    <td class="bold">Employee Name | ID</td>
+                    <td class="amount"><span class="bold">{{ PaySlip_Data.complete_name }} | 20240000{{ PaySlip_Data.employee_id }}</span></td>
                 </tr>
                 <tr>
-                    <td>Pay Period:</td>
-                    <td class="amount"><span class="bold">{{ PaySlip_Data.period_start }}</span> to <span class="bold">{{ PaySlip_Data.period_end }}</span></td>
+                    <td class="bold">Pay Period</td>
+                    <td class="amount"><span class="bold">{{ PaySlip_Data.period_start }} to {{ PaySlip_Data.period_end }}</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">Regular Hours</td>
+                    <td class="amount bold">{{ PaySlip_Data.regular_hours }}</td>
+                </tr>
+                <tr>
+                    <td class="bold">Overtime Hours</td>
+                    <td class="amount bold">{{ PaySlip_Data.overtime_hours }}</td>
                 </tr>
             </table>
             <div class="separator"></div>
@@ -96,15 +154,20 @@
         <div class="payslip-section">
             <table class="table">
                 <tr>
-                    <td class="section-title bold">Basic Pay</td>
-                    <td class="amount bold">Php {{ PaySlip_Data.basic_pay }}</td>
+                    <td class="section-title bold">Gross Pay Regular</td>
+                    <td class="amount bold">Php {{ PaySlip_Data.basic_pay_regular }}</td>
                 </tr>
+                <tr>
+                    <td class="section-title bold">Overtime Pay</td>
+                    <td class="amount bold">Php {{ PaySlip_Data.basic_pay_overtime }}</td>
+                </tr>
+                
                 <div class="separator"></div>
                 {% if PaySlip_Data.addition_details %}
                 {% for addition in PaySlip_Data.addition_details %}
                 <tr>
-                    <td>{{ addition.name }}</td>
-                    <td class="amount">Php {{ addition.amount }}</td>
+                    <td class="bold">{{ addition.name }}</td>
+                    <td class="amount bold">Php {{ addition.amount }}</td>
                 </tr>
                 {% endfor %}
                 <tr>
@@ -119,7 +182,7 @@
         <div class="payslip-section">
             <table class="table">
                 <tr>
-                    <td class="section-title bold">GROSS PAY:</td>
+                    <td class="section-title bold"> TOTAL GROSS PAY:</td>
                     <td class="amount bold">Php {{ PaySlip_Data.gross_pay }}</td>
                 </tr>
             </table>
@@ -157,7 +220,7 @@
         <div class="payslip-section">
             <table class="table">
                 <tr>
-                    <td class="bold" style="padding-top: 20px;">Received by:</td>
+                    <td class="bold" style="padding-top: 10px;">Received by:</td>
                 </tr>
             </table>
             <div class="separator"></div>

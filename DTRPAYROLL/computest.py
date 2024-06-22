@@ -7,11 +7,25 @@ import calendar
 import json
 from datetime import datetime, timedelta
 from django.http import JsonResponse
+from posixpath import abspath
+import sys
+import time
+from datetime import datetime, timedelta
+from zk import ZK, const
+
+# Setup ZkTeco Device = MA300
+sys.path.insert(1,abspath("./pyzk"))
+CWD = os.path.dirname(os.path.realpath(__file__))
+ROOT_DIR = os.path.dirname(CWD)
+sys.path.append(ROOT_DIR)
+sys.path.append("zk")
+
 
 
 # Setup Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
+
 
 # Import models
 from employeeDTR.models import Employee, Deductions, Benefits
@@ -238,7 +252,7 @@ def format_dtr(dtr_records, start_date, end_date, payroll_data):
         "time": time[0],  # Extracting the string directly
         "mode": mode[0],  # Extracting the string directly
         "remarks": remarks[0]  ,# Extracting the string directly
-        "grand_total_hours":total_hours_worked,
+        "grand_total_hours": f"{total_hours_worked:.2f}",  # Format to two decimal places
         "total_hours_weekly": total_hours_weekly
     }
 
@@ -269,3 +283,42 @@ def format_dates(date1, date2):
     else:
         # Different months and years (e.g., Jan 01, 2023 - Dec 01, 2024)
         return f"{date1.strftime(date_format)} - {date2.strftime(date_format)}"
+
+
+# def device():
+#     conn = None
+#     zk = ZK('192.168.1.201', port=4370, timeout=5, password=0, force_udp=True, ommit_ping=False)
+#     try:
+#         print ('Connecting to device ...')
+#         conn = zk.connect()
+#         print ('Disabling device ...')
+#         conn.disable_device()
+#         print ('Firmware Version: : {}'.format(conn.get_firmware_version()))
+#         # print '--- Get User ---'
+#         users = conn.get_users()
+#         for user in users:
+#             privilege = 'User'
+#             if user.usertype() == const.USER_ADMIN:
+#                 privilege = 'Admin'
+#             elif user.usertype() == const.USER_MANAGER:
+#                 privilege = 'Manager'
+#             elif user.usertype() == const.USER_ENROLLER:
+#                 privilege = 'Enroller'
+#             if user.is_disabled():
+#                 privilege += '(DISABLED)'
+#             print ('- UID #{}'.format(user.uid))
+#             print ('  Name       : {}'.format(user.name))
+#             print ('  Privilege  : {}'.format(privilege))
+#             print ('  Password   : {}'.format(user.password))
+#             print ('  Group ID   : {}'.format(user.group_id))
+#             print ('  User  ID   : {}'.format(user.user_id))
+
+#         print ("Voice Test ...")
+#         conn.test_voice()
+#         print ('Enabling device ...')
+#         conn.enable_device()
+#     except Exception as e:
+#         print ("Process terminate : {}".format(e))
+#     finally:
+#         if conn:
+#             conn.disconnect()

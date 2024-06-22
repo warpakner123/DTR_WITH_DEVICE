@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseBadRequest
-from .models import Employee, DTR, Department, Position, LoansTaxes, NightDifferential, Deductions, Benefits
+from .models import Employee, DTR, Department, Position, LoansTaxes, Deductions, Benefits
 from .forms import AddEmployeeForm, EmployeeForm, UploadFileForm, DTRForm
 from django.contrib import messages
 from computest import calculate_payroll, format_dates, format_dtr
@@ -28,11 +28,25 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-
+from django.http import JsonResponse
+import subprocess
+import sys
+import os
+from posixpath import abspath
+from django.views.decorators.csrf import csrf_exempt
 # from django.shortcuts import render
 # from django.http import HttpResponse
 # from django.template.loader import get_template
 # from weasyprint import HTML
+
+from zk import ZK, const
+
+# Setup ZkTeco Device = MA300
+sys.path.insert(1,abspath("./pyzk"))
+CWD = os.path.dirname(os.path.realpath(__file__))
+ROOT_DIR = os.path.dirname(CWD)
+sys.path.append(ROOT_DIR)
+sys.path.append("zk")
 
 
 def generate_pdf_payroll_view(request):
@@ -175,8 +189,9 @@ def hr_dashboard(request):
         employees = Employee.objects.all()
         total_employees = Employee.objects.count()
         active_employees = Employee.objects.filter(status=1).count()
-        today_date = now().date()
+        today_date = datetime.now()
         today_attendance = DTR.objects.filter(datetime__date=today_date, status='C/In').count()
+        formatted_date = today_date.strftime("%B %d, %Y %I:%M:%S %p")
 
         for employee in employees:
             employee.full_name = f"{employee.first_name} {employee.last_name}".title()
@@ -188,7 +203,7 @@ def hr_dashboard(request):
             "total_employees":total_employees,
             "today_attendance":today_attendance,
             "active_employees":active_employees,
-            "today_date":today_date
+            "today_date":formatted_date
         }
 
         return render(request, 'hr_dashboard.html',context)
@@ -236,11 +251,12 @@ def attendance(request):
                                 id_number=id_number,
                             )
                         except Employee.DoesNotExist:
-                            messages.error(request, f'Employee with ID {number} not found.')
+                            messages.error(request, f'Employee {name} with ID number {number} not found or uploaded in the system!')
 
                     messages.success(request, 'Excel file uploaded and processed successfully.')
                 except Exception as e:
-                    messages.error(request, f'An error occurred: {e}')
+                    messages.error(request, f'An error occurred: {e} Employee ID is missing from the EXCEL FILE you uploaded!')
+                    #print("MAO NI ANG ERROR!")
                 return redirect('attendance')
 
         elif 'manual_submit' in request.POST:
@@ -786,3 +802,131 @@ def compensation(request):
             "loans_taxes":loans_taxes,
         }
         return render(request, 'compensation.html', context)
+    
+
+def run_script(request):
+    try:
+        result =subprocess.run(['python3','./templates/live_capture.html'])
+        return JsonResponse({'Status': 'success', 'output': result.stdout})
+    except Exception as e:
+        return JsonResponse({'statuts': 'error', 'message': str(e)})
+    
+    # ========================== > FUNCTIONS FOR DEVICE MA300 < ==================================
+def device(request):
+    employees = Employee.objects.all()
+    total_employees = Employee.objects.count()
+    active_employees = Employee.objects.filter(status=1).count()
+    today_date = datetime.now()
+    today_attendance = DTR.objects.filter(datetime__date=today_date, status='C/In').count()
+    formatted_date = today_date.strftime("%B %d, %Y %I:%M:%S %p")
+    for employee in employees:
+        employee.full_name = f"{employee.first_name} {employee.last_name}".title()
+        employee.department.department_name= employee.department.department_name.title()
+        employee.position.position = employee.position.position.title()
+        
+    
+    context ={
+        'employee':employees,
+        "total_employees": total_employees,
+        "today_attendance": today_attendance,
+        "active_employees":active_employees,
+        "today_date": formatted_date,
+    }
+    
+
+    return render(request, 'device.html', context)
+
+@csrf_exempt      
+def test_device(request):
+    if request.method =='POST':
+        result = test_connection()
+        return JsonResponse(result)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+def test_connection(request):
+    #BASIC TEST
+    print("test_connection")
+    conn = None
+    zk = ZK('192.168.1.201', port=4370, timeout=5, password=0, force_udp=True, ommit_ping=False)
+    try:
+        print ('Connecting to device ...')
+        conn = zk.connect()
+        print ('Disabling device ...')
+        conn.disable_device()
+        firmware_version = conn.get_firmware_version()
+        print ('Firmware Version: : {}'.format(conn.get_firmware_version()))
+        users = conn.get_users()
+        users_info=[]
+        for user in users:
+            privilege = 'User'
+            if user.usertype() == const.USER_ADMIN:
+                privilege = 'Admin'
+            elif user.usertype() == const.USER_MANAGER:
+                privilege = 'Manager'
+            elif user.usertype() == const.USER_ENROLLER:
+                privilege = 'Enroller'
+            if user.is_disabled():
+                privilege += '(DISABLED)'
+            users_info.append({
+                'uid': user.uid,
+                'name': user.name,
+                'privilege': privilege,
+                'password': user.password,
+                'group_id': user.group_id,
+                'user_id': user.user_id,  
+            })
+            # print ('- UID #{}'.format(user.uid))
+            # print ('  Name       : {}'.format(user.name))
+            # print ('  Privilege  : {}'.format(privilege))
+            # print ('  Password   : {}'.format(user.password))
+            # print ('  Group ID   : {}'.format(user.group_id))
+            # print ('  User  ID   : {}'.format(user.user_id))
+
+        print ("Voice Test ...")
+        conn.test_voice()
+        print ('Enabling device ...')
+        conn.enable_device()
+        return {'status': 'success', 'firmware_version': firmware_version, 'users': users_info}
+    except Exception as e:
+        print ("Process terminate : {}".format(e))
+        return {'status': 'error', 'message': str(e)}
+    finally:
+        if conn:
+            conn.disconnect()
+
+
+# def update_device_time():
+#     conn = None
+#     zk = ZK('192.168.2.201', port=4370)
+#     try:
+#         conn = zk.connect()
+#         print ("Syncing time...")
+#         conn.set_time(datetime.now())
+#     except Exception as e:
+#         print ("Process terminate : {}".format(e))
+#     finally:
+#         if conn:
+#             conn.disconnect()
+            
+
+# def activate_device(): #LIVE CAPTURE
+#     conn = None
+#     zk = ZK('192.168.1.201', port=4370, timeout=5, password=0, force_udp=True, ommit_ping=False)
+#     try:
+#         conn = zk.connect()
+#         conn.set_time(datetime.now())
+#         print("Updating Time!")
+#         print("Time Updated!")
+#         print("Running Live Capture!")
+#         for attendance in conn.live_capture():
+#             if attendance is None:
+#                 pass
+#             else:
+#                 print (attendance)
+#     except Exception as e:
+#         print ("Process terminate : {}".format(e))
+#     finally:
+#         if conn:
+#             conn.disconnect()
+            

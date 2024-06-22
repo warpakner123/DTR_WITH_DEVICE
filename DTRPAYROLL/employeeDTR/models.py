@@ -67,7 +67,7 @@ class Employee(models.Model):
 class DTR(models.Model):
     department = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
-    number = models.IntegerField() #using the as the employee_id
+    number = models.IntegerField() #using as the employee_id
     datetime = models.DateTimeField(default=datetime.now)  # Add default value
     status = models.CharField(max_length=10)   #only has C/In or Checked In, no Checked Out status
     location_id = models.IntegerField()  #branch location
@@ -79,9 +79,3 @@ class DTR(models.Model):
 class Deductions(models.Model):
     employee=models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
     loanTaxes=models.ForeignKey(LoansTaxes, on_delete=models.CASCADE, null=True)
-
-class NightDifferential(models.Model):
-    id = models.AutoField(primary_key=True)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    rate_multiplier = models.DecimalField(max_digits=5, decimal_places=2)  # Rate multiplier for night differential
