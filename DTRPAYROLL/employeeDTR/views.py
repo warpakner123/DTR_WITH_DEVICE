@@ -824,7 +824,6 @@ def device(request):
         employee.department.department_name= employee.department.department_name.title()
         employee.position.position = employee.position.position.title()
         
-    
     context ={
         'employee':employees,
         "total_employees": total_employees,
@@ -832,21 +831,6 @@ def device(request):
         "active_employees":active_employees,
         "today_date": formatted_date,
     }
-    
-
-    return render(request, 'device.html', context)
-
-@csrf_exempt      
-def test_device(request):
-    if request.method =='POST':
-        result = test_connection()
-        return JsonResponse(result)
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
-
-def test_connection(request):
-    #BASIC TEST
-    print("test_connection")
     conn = None
     zk = ZK('192.168.1.201', port=4370, timeout=5, password=0, force_udp=True, ommit_ping=False)
     try:
@@ -854,7 +838,8 @@ def test_connection(request):
         conn = zk.connect()
         print ('Disabling device ...')
         conn.disable_device()
-        firmware_version = conn.get_firmware_version()
+        print ("Syncing time...")
+        conn.set_time(datetime.now())
         print ('Firmware Version: : {}'.format(conn.get_firmware_version()))
         users = conn.get_users()
         users_info=[]
@@ -876,24 +861,79 @@ def test_connection(request):
                 'group_id': user.group_id,
                 'user_id': user.user_id,  
             })
-            # print ('- UID #{}'.format(user.uid))
-            # print ('  Name       : {}'.format(user.name))
-            # print ('  Privilege  : {}'.format(privilege))
-            # print ('  Password   : {}'.format(user.password))
-            # print ('  Group ID   : {}'.format(user.group_id))
-            # print ('  User  ID   : {}'.format(user.user_id))
+            print ('- UID #{}'.format(user.uid))
+            print ('  Name       : {}'.format(user.name))
+            print ('  Privilege  : {}'.format(privilege))
+            print ('  Password   : {}'.format(user.password))
+            print ('  Group ID   : {}'.format(user.group_id))
+            print ('  User  ID   : {}'.format(user.user_id))
 
         print ("Voice Test ...")
         conn.test_voice()
         print ('Enabling device ...')
         conn.enable_device()
-        return {'status': 'success', 'firmware_version': firmware_version, 'users': users_info}
+        return render(request, 'device.html', context)
     except Exception as e:
         print ("Process terminate : {}".format(e))
         return {'status': 'error', 'message': str(e)}
     finally:
         if conn:
             conn.disconnect()
+        
+    
+
+
+
+# def test_connection(request):
+#     #BASIC TEST
+#     print("test_connection")
+#     conn = None
+#     zk = ZK('192.168.1.201', port=4370, timeout=5, password=0, force_udp=True, ommit_ping=False)
+#     try:
+#         print ('Connecting to device ...')
+#         conn = zk.connect()
+#         print ('Disabling device ...')
+#         conn.disable_device()
+#         firmware_version = conn.get_firmware_version()
+#         print ('Firmware Version: : {}'.format(conn.get_firmware_version()))
+#         users = conn.get_users()
+#         users_info=[]
+#         for user in users:
+#             privilege = 'User'
+#             if user.usertype() == const.USER_ADMIN:
+#                 privilege = 'Admin'
+#             elif user.usertype() == const.USER_MANAGER:
+#                 privilege = 'Manager'
+#             elif user.usertype() == const.USER_ENROLLER:
+#                 privilege = 'Enroller'
+#             if user.is_disabled():
+#                 privilege += '(DISABLED)'
+#             users_info.append({
+#                 'uid': user.uid,
+#                 'name': user.name,
+#                 'privilege': privilege,
+#                 'password': user.password,
+#                 'group_id': user.group_id,
+#                 'user_id': user.user_id,  
+#             })
+#             # print ('- UID #{}'.format(user.uid))
+#             # print ('  Name       : {}'.format(user.name))
+#             # print ('  Privilege  : {}'.format(privilege))
+#             # print ('  Password   : {}'.format(user.password))
+#             # print ('  Group ID   : {}'.format(user.group_id))
+#             # print ('  User  ID   : {}'.format(user.user_id))
+
+#         print ("Voice Test ...")
+#         conn.test_voice()
+#         print ('Enabling device ...')
+#         conn.enable_device()
+#         return {'status': 'success', 'firmware_version': firmware_version, 'users': users_info}
+#     except Exception as e:
+#         print ("Process terminate : {}".format(e))
+#         return {'status': 'error', 'message': str(e)}
+#     finally:
+#         if conn:
+#             conn.disconnect()
 
 
 # def update_device_time():
