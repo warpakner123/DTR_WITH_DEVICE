@@ -16,7 +16,11 @@ pip install -r requirements.txt
 and using this as the table name "dtr_payroll"
 
 #migrate
+python manage.py makemigrations
 python manage.py migrate
+
+#install pyzk source : https://github.com/fananimi/pyzk extracted file should be in django project
+pip install -U pyzk
 
 #runserver
 python manage.py runserver
